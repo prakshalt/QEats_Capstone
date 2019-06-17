@@ -13,7 +13,6 @@ import com.prakshal.qeats.R;
 import com.prakshal.qeats.ShowRestaurantMenuActivity;
 import com.prakshal.qeats.app.AppController;
 import com.prakshal.qeats.model.Item;
-import com.prakshal.qeats.model.Movie;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -44,32 +43,28 @@ import org.json.JSONObject;
 public class CustomMenuListAdapter extends BaseAdapter {
     private Activity activity;
     private LayoutInflater inflater;
-    private List<Item> movieItems;
-    Context context;
+    private List<Item> menuItems;
     View view;
-   // private String itemId;
     private String respStr;
     private String cartId;
     private String restId;
     private ProgressDialog pDialog;
     ImageLoader imageLoader = AppController.getInstance().getImageLoader();
 
-    public CustomMenuListAdapter(Activity activity, List<Item> movieItems,String Restid) {
-        Log.i("Constructor","called");
+    public CustomMenuListAdapter(Activity activity, List<Item> menuItems,String Restid) {
         this.activity = activity;
-        this.movieItems = movieItems;
+        this.menuItems = menuItems;
         this.restId=Restid;
-     //   this.context=activity.getApplicationContext();
     }
 
     @Override
     public int getCount() {
-        return movieItems.size();
+        return menuItems.size();
     }
 
     @Override
     public Object getItem(int location) {
-        return movieItems.get(location);
+        return menuItems.get(location);
     }
 
     @Override
@@ -79,7 +74,6 @@ public class CustomMenuListAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, final ViewGroup parent) {
-//        context = convertView.getContext();
         view = convertView;
         if (inflater == null)
             inflater = (LayoutInflater) activity
@@ -89,31 +83,18 @@ public class CustomMenuListAdapter extends BaseAdapter {
 
         if (imageLoader == null)
             imageLoader = AppController.getInstance().getImageLoader();
-       // NetworkImageView thumbNail = (NetworkImageView) convertView
-               // .findViewById(R.id.thumbnail);
         final TextView title = (TextView) convertView.findViewById(R.id.itemname);
         final TextView Itemidtv = (TextView) convertView.findViewById(R.id.itemid);
         TextView timings = (TextView) convertView.findViewById(R.id.price);
         TextView genre = (TextView) convertView.findViewById(R.id.attributes);
-       // TextView ratings = (TextView) convertView.findViewById(R.id.releaseYear);
 
-        // getting movie data for the row
-        Item m = movieItems.get(position);
+        Item m = menuItems.get(position);
 
-       // itemId = m.getItemId();
-//        Log.i("itemId",itemId);
-        // thumbnail image
-       // thumbNail.setImageUrl(m.getImageUrl(), imageLoader);
-
-        // title
         title.setText(m.getName());
 
         Itemidtv.setText(m.getItemId());
 
-        // rating
         timings.setText("Price: " + String.valueOf(m.getPrice()));
-
-        // genre
         String genreStr = "";
         for (String str : m.getAttributes()) {
             genreStr += str + ", ";
@@ -155,19 +136,13 @@ public class CustomMenuListAdapter extends BaseAdapter {
         AppController.getInstance().addToRequestQueue(obreq);
 
 
-        // release year
-       // ratings.setText("Ratings:"+String.valueOf(5));
         Button addToCartBtn= (Button)convertView.findViewById(R.id.add_to_cart_btn);
 
         addToCartBtn.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-               // Toast.makeText(ShowRestaurantMenuActivity.this,"You may have not granted one of the permissions",Toast.LENGTH_LONG).show();
-                Log.i("btn cliced",Itemidtv.getText().toString());
                 String resp = sendAddToCartRequest(cartId,Itemidtv.getText().toString(),restId);
-                //if(sendAddToCartRequest(itemId,restId).equals("0")){
                    Toast.makeText(parent.getContext(),"Item added to cart",Toast.LENGTH_LONG).show();
-                //}
             }
         });
 
@@ -176,39 +151,7 @@ public class CustomMenuListAdapter extends BaseAdapter {
 
     public String sendAddToCartRequest(final String cartid,final String itemId,final String restId){
         String ip="35.200.227.34";
-       /* String geturl = "http://"+ip+":8081/qeats/v1/cart?userId=Prakshal";
 
-
-        JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, geturl,null, new
-
-                Response.Listener<JSONObject>() {
-
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        Log.i("Inside","response");
-                        Log.i("JSONResponse",response.toString());
-                        try {
-                            Log.i(response.getString("id"),"h");
-
-                        }catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.i("inside","errorresponse");
-                // VolleyLog.d(TAG, "Error: " + error.getClass());
-                error.printStackTrace();
-
-            }
-        });
-
-        AppController.getInstance().addToRequestQueue(obreq);
-
-
-*/
-        Log.i("in fn",cartid+itemId+","+restId);
 
         String url = "http://"+ip+":8081/qeats/v1/cart/item";
         final String requestBody="{\"cartId\":\""+cartId+"\","+
@@ -221,8 +164,6 @@ public class CustomMenuListAdapter extends BaseAdapter {
                     public void onResponse(String response)
                     {
                         Log.i("response",response);
-                        //respStr = response.ge
-                       // Toast.makeText(getApplicationContext(), response, Toast.LENGTH_SHORT).show();
                     }
                 },
                 new Response.ErrorListener()
@@ -230,26 +171,9 @@ public class CustomMenuListAdapter extends BaseAdapter {
                     @Override
                     public void onErrorResponse(VolleyError error)
                     {
-                       // Log.i("error",error.getMessage());
-                        //Toast.makeText(getApplicationContext(), error.toString(), Toast.LENGTH_SHORT).show();
                     }
                 })
         {
-            /*@Override
-            protected Map<String, String> getParams()
-            {
-                Map<String, String> params = new HashMap<String, String>();
-                params.put("cartId",cartId);
-                params.put("itemId",itemId);
-                params.put("restaurantId",restId);
-                return params;
-            }*/
-           /* @Override
-            public Map getHeaders() throws AuthFailureError {
-                HashMap headers = new HashMap();
-                headers.put("Content-Type", "application/json");
-                return headers;
-            }*/
            @Override
            public Map<String, String> getHeaders() throws AuthFailureError {
                HashMap<String, String> headers = new HashMap<String, String>();
@@ -266,48 +190,6 @@ public class CustomMenuListAdapter extends BaseAdapter {
                 }
             }
         };
-
-
-
-      /*  Map<String, String> params = new HashMap();
-        params.put("CartId","1");
-        params.put("itemId",itemId);
-        params.put("restaurantId",restId);
-        JSONObject requestBody = new JSONObject(params);
-        String requestString = requestBody.toString();
-        /*pDialog = new ProgressDialog(.getContext());
-        // Showing progress dialog before making http request
-        pDialog.setMessage("Loading...");
-        pDialog.show();*/
-        /*JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.POST, url,requestBody, new
-                Response.Listener<JSONObject>() {
-
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        Log.i("Inside","response");
-                        Log.i("JSONResponse",response.toString());
-                        try {
-                            //JSONObject obj2 = response.getJSONObject("cartResponseType");
-                            respStr = response.getString("cartResponseType");
-                        }catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.i("inside","errorresponse");
-                // VolleyLog.d(TAG, "Error: " + error.getClass());
-                error.printStackTrace();
-                hidePDialog();
-
-            }
-        });
-        obreq.setRetryPolicy(new DefaultRetryPolicy(
-                10000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));*/
-        // Adding request to request queue
 
         AppController.getInstance().addToRequestQueue(strRequest);
         return respStr;

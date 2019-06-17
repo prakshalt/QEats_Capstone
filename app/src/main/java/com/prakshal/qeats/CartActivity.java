@@ -39,7 +39,7 @@ import java.util.List;
 import java.util.Map;
 
 public class CartActivity extends BaseDrawerActivity implements ActivityCompat.OnRequestPermissionsResultCallback {
-    private String ip="35.200.227.34";
+    private String ip="35.200.227.34"; // Change ip here to your server's
     private String url = "http://"+ip+":8081/qeats/v1/cart?userId=Prakshal";//21.724216&longitude=73.01525";
     private ProgressDialog pDialog;
     private List<Item> itemList = new ArrayList<Item>();
@@ -71,43 +71,33 @@ public class CartActivity extends BaseDrawerActivity implements ActivityCompat.O
         adapter = new CustomCartListAdapter(this, itemList);
         listView.setAdapter(adapter);
         pDialog = new ProgressDialog(this);
-        // Showing progress dialog before making http request
+        // Showing progress dialog before making http request(i.e Loading anim)
         pDialog.setMessage("Loading...");
         pDialog.show();
-        Log.i("before","req");
+        //This is used to send request for getting a JSON object.
         JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, url,null, new
 
                 Response.Listener<JSONObject>() {
 
                     @Override
                     public void onResponse(JSONObject response) {
-                        Log.i("Inside","response");
                         try {
-                            JSONArray obj1 = response.getJSONArray("items");
+                            JSONArray obj1 = response.getJSONArray("items"); //This gives array of objects
                             Log.i("JSONResponse",response.toString());
-                            cartId = response.getString("id");
-                            //Log.d(TAG, obj1.toString());
-                            hidePDialog();
+                            cartId = response.getString("id"); //use getters on response to get value of specific key
+                            hidePDialog();//stop loading anim
 
                             // Parsing json
                             for (int i = 0; i < obj1.length(); i++) {
 
 
                                 JSONObject obj = obj1.getJSONObject(i);
-                              /*  Movie movie = new Movie();
-                                movie.setTitle(obj.getString("title"));
-                                movie.setThumbnailUrl(obj.getString("image"));
-                                movie.setRating(((Number) obj.get("rating"))
-                                        .doubleValue());
-                                movie.setYear(obj.getInt("releaseYear"));*/
                                 Item item = new Item();
                                 item.setItemId(obj.getString("itemId"));
                                 item.setName(obj.getString("name"));
                                 item.setImageUrl(obj.getString("imageUrl"));
                                 item.setPrice(obj.getInt("price"));
                                 addTotal(item.getPrice());
-                                //total+=item.getPrice();
-                                // Genre is json array
                                 JSONArray genreArry = obj.getJSONArray("attributes");
                                 ArrayList<String> genre = new ArrayList<String>();
                                 for (int j = 0; j < genreArry.length(); j++) {
@@ -115,7 +105,7 @@ public class CartActivity extends BaseDrawerActivity implements ActivityCompat.O
                                 }
                                 item.setAttributes(genre);
 
-                                // adding movie to movies array
+                                // adding item to items list
                                 itemList.add(item);
                                 priceList.add(obj.getInt("price"));
                             }
@@ -146,6 +136,7 @@ public class CartActivity extends BaseDrawerActivity implements ActivityCompat.O
         TextView carttotal = (TextView) findViewById(R.id.carttotal);
         carttotal.setText("Total="+String.valueOf(getTotal()));
 
+        //Order Button
         Button orderBtn = (Button) findViewById(R.id.orderbtn);
         orderBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -153,14 +144,13 @@ public class CartActivity extends BaseDrawerActivity implements ActivityCompat.O
                 String response = sendOrder(cartId);
             }
         });
-       // recreate();
 
     }
 
     public String sendOrder(String cartId){
         String url = "http://35.200.159.249:8081/qeats/v1/order";
         final String requestBody="{\"cartId\":\""+cartId+"\"}";
-
+        //This is a Stringrequest means response will be a string and request method can be any
         StringRequest strRequest = new StringRequest(Request.Method.POST, url,
                 new Response.Listener<String>()
                 {
@@ -169,7 +159,6 @@ public class CartActivity extends BaseDrawerActivity implements ActivityCompat.O
                     {
                         Log.i("response",response);
                         respStr = response;
-                        // Toast.makeText(getApplicationContext(), response, Toast.LENGTH_SHORT).show();
                     }
                 },
                 new Response.ErrorListener()
@@ -177,8 +166,7 @@ public class CartActivity extends BaseDrawerActivity implements ActivityCompat.O
                     @Override
                     public void onErrorResponse(VolleyError error)
                     {
-                        // Log.i("error",error.getMessage());
-                        //Toast.makeText(getApplicationContext(), error.toString(), Toast.LENGTH_SHORT).show();
+
                     }
                 })
         {
@@ -206,7 +194,6 @@ public class CartActivity extends BaseDrawerActivity implements ActivityCompat.O
         super.onResume();
         // to check current activity in the navigation drawer
         navigationView.getMenu().getItem(2).setChecked(true);
-   //     recreate();
         final Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override

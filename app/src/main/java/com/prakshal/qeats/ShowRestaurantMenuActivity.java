@@ -47,8 +47,6 @@ public class ShowRestaurantMenuActivity extends BaseDrawerActivity implements Ac
         url +=  restId;
         listView = (ListView) findViewById(R.id.menus);
         adapter = new CustomMenuListAdapter(ShowRestaurantMenuActivity.this, restaurantList,restId);
-        Log.i("adapter",adapter.toString());
-        Log.i("listview",listView.toString());
         listView.setAdapter(adapter);
 
         pDialog = new ProgressDialog(this);
@@ -56,20 +54,15 @@ public class ShowRestaurantMenuActivity extends BaseDrawerActivity implements Ac
         pDialog.setMessage("Loading...");
         pDialog.show();
 
-        Log.i("Before sending",url);
         JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, url,null, new
 
                 Response.Listener<JSONObject>() {
 
                     @Override
                     public void onResponse(JSONObject response) {
-                        Log.i("Inside","response");
-                        Log.i("JSONResponse",response.toString());
                         try {
                             JSONObject obj2 = response.getJSONObject("menu");
                             JSONArray obj1 = obj2.getJSONArray("items");
-                            Log.i("JSONResponse",response.toString());
-                           // Log.d(TAG, obj1.toString());
                             hidePDialog();
 
                             // Parsing json
@@ -77,20 +70,12 @@ public class ShowRestaurantMenuActivity extends BaseDrawerActivity implements Ac
 
 
                                 JSONObject obj = obj1.getJSONObject(i);
-                              /*  Movie movie = new Movie();
-                                movie.setTitle(obj.getString("title"));
-                                movie.setThumbnailUrl(obj.getString("image"));
-                                movie.setRating(((Number) obj.get("rating"))
-                                        .doubleValue());
-                                movie.setYear(obj.getInt("releaseYear"));*/
                                 Item item = new Item();
                                 item.setItemId(obj.getString("itemId"));
                                 item.setName(obj.getString("name"));
                                 item.setPrice(obj.getInt("price"));
-                                Log.i("ItemName",item.getName());
                                 item.setImageUrl(obj.getString("imageUrl"));
 
-                                // Genre is json array
                                 JSONArray genreArry = obj.getJSONArray("attributes");
                                 ArrayList<String> genre = new ArrayList<String>();
                                 for (int j = 0; j < genreArry.length(); j++) {
@@ -98,12 +83,10 @@ public class ShowRestaurantMenuActivity extends BaseDrawerActivity implements Ac
                                 }
                                 item.setAttributes(genre);
 
-                                // adding movie to movies array
                                 restaurantList.add(item);
 
 
                             }
-                            Log.i("List size",Integer.toString(restaurantList.size()));
                         }catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -117,7 +100,6 @@ public class ShowRestaurantMenuActivity extends BaseDrawerActivity implements Ac
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.i("inside","errorresponse");
-               // VolleyLog.d(TAG, "Error: " + error.getClass());
                 error.printStackTrace();
                 hidePDialog();
 

@@ -3,7 +3,6 @@ package com.prakshal.qeats.adapter;
 import com.prakshal.qeats.R;
 import com.prakshal.qeats.app.AppController;
 import com.prakshal.qeats.model.Item;
-import com.prakshal.qeats.model.Movie;
 
 import java.util.List;
 
@@ -23,22 +22,22 @@ import com.prakshal.qeats.model.Restaurant;
 public class CustomCartListAdapter extends BaseAdapter {
     private Activity activity;
     private LayoutInflater inflater;
-    private List<Item> movieItems;
+    private List<Item> itemList;
     ImageLoader imageLoader = AppController.getInstance().getImageLoader();
 
-    public CustomCartListAdapter(Activity activity, List<Item> movieItems) {
+    public CustomCartListAdapter(Activity activity, List<Item> items) {
         this.activity = activity;
-        this.movieItems = movieItems;
+        this.itemList = items;
     }
 
     @Override
     public int getCount() {
-        return movieItems.size();
+        return itemList.size();
     }
 
     @Override
     public Object getItem(int location) {
-        return movieItems.get(location);
+        return itemList.get(location);
     }
 
     @Override
@@ -61,10 +60,8 @@ public class CustomCartListAdapter extends BaseAdapter {
         TextView pricetv = (TextView) convertView.findViewById(R.id.pricecartitem);
 
         TextView totaltv = (TextView) convertView.findViewById(R.id.carttotal);
-        // getting movie data for the row
-        Item m = movieItems.get(position);
+        Item m = itemList.get(position);
 
-        // title
         title.setText(m.getName());
 
         pricetv.setText(String.valueOf(m.getPrice()));

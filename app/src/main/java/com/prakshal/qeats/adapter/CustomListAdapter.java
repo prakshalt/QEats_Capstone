@@ -2,7 +2,6 @@ package com.prakshal.qeats.adapter;
 
 import com.prakshal.qeats.R;
 import com.prakshal.qeats.app.AppController;
-import com.prakshal.qeats.model.Movie;
 
 import java.util.List;
 
@@ -21,22 +20,22 @@ import com.prakshal.qeats.model.Restaurant;
 public class CustomListAdapter extends BaseAdapter {
     private Activity activity;
     private LayoutInflater inflater;
-    private List<Restaurant> movieItems;
+    private List<Restaurant> restaurantList;
     ImageLoader imageLoader = AppController.getInstance().getImageLoader();
 
-    public CustomListAdapter(Activity activity, List<Restaurant> movieItems) {
+    public CustomListAdapter(Activity activity, List<Restaurant> restaurantList) {
         this.activity = activity;
-        this.movieItems = movieItems;
+        this.restaurantList = restaurantList;
     }
 
     @Override
     public int getCount() {
-        return movieItems.size();
+        return restaurantList.size();
     }
 
     @Override
     public Object getItem(int location) {
-        return movieItems.get(location);
+        return restaurantList.get(location);
     }
 
     @Override
@@ -63,7 +62,7 @@ public class CustomListAdapter extends BaseAdapter {
         TextView ratings = (TextView) convertView.findViewById(R.id.releaseYear);
 
         // getting movie data for the row
-        Restaurant m = movieItems.get(position);
+        Restaurant m = restaurantList.get(position);
 
         // thumbnail image
         thumbNail.setImageUrl(m.getImageUrl(), imageLoader);

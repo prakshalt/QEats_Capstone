@@ -60,20 +60,14 @@ public class BaseDrawerActivity extends AppCompatActivity implements NavigationV
             startActivity(new Intent(getApplicationContext(),MainActivity.class));
         }*/
         if (id == R.id.nav_near) {
-            // Handle the camera action
             startActivity(new Intent(getApplicationContext(), MainActivity.class));
         } else if (id == R.id.nav_search) {
             startActivity(new Intent(getApplicationContext(), SearchActivity.class));
         }
         else if(id==R.id.nav_cart){
             startActivity(new Intent(getApplicationContext(),CartActivity.class));
-        }/*
-        else if(id==R.id.nav_add_no){
-            startActivity(new Intent(getApplicationContext(),addnoactivity.class));
         }
-        else if(id==R.id.nav_drive_setup){
-            startActivity(new Intent(getApplicationContext(),DriveSetup.class));
-        }*/
+        //Add more here to go to that activity on select
         drawerLayout.closeDrawer(GravityCompat.START);
         return true;
     }

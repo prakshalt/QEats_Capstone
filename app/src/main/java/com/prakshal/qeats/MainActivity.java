@@ -5,7 +5,6 @@ import com.android.volley.Request;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.prakshal.qeats.adapter.CustomListAdapter;
 import com.prakshal.qeats.app.AppController;
-import com.prakshal.qeats.model.Movie;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,14 +45,11 @@ import com.android.volley.toolbox.JsonArrayRequest;
 import com.prakshal.qeats.model.Restaurant;
 
 public class MainActivity extends BaseDrawerActivity implements ActivityCompat.OnRequestPermissionsResultCallback{ //implements LocationListener {
-    //LocationManager mLocationManager;
-    // Log tag
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final int MY_PERMISSIONS_REQUEST_RECEIVE_SMS =0;
     String perms[]={Manifest.permission.ACCESS_COARSE_LOCATION,Manifest.permission.ACCESS_FINE_LOCATION};
 
 
-    // Movies json url
     private String ip="35.200.227.34";
     private String url = "http://"+ip+":8081/qeats/v1/restaurants?latitude=";//21.724216&longitude=73.01525";
     private ProgressDialog pDialog;
@@ -130,8 +126,6 @@ public class MainActivity extends BaseDrawerActivity implements ActivityCompat.O
 
         }
 
-        //mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        //Location location = mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,0,0,this);
         SingleShotLocationProvider.requestSingleUpdate(this,
                 new SingleShotLocationProvider.LocationCallback() {
                     @Override public void onNewLocationAvailable(SingleShotLocationProvider.GPSCoordinates location) {
@@ -165,10 +159,6 @@ public class MainActivity extends BaseDrawerActivity implements ActivityCompat.O
 
                 String restId = restaurant.getRestaurantId();
 
-                // Show Alert
-              //  Toast.makeText(getApplicationContext(),
-                //        "Position :"+itemPosition+"  ListItem : " +restId , Toast.LENGTH_LONG)
-                  //      .show();
                 Intent intent = new Intent(getBaseContext(), ShowRestaurantMenuActivity.class);
                 intent.putExtra("RESTAURANT_ID", restId);
                 intent.putExtra("RESTAURANT_NAME",restaurant.getName());
@@ -176,23 +166,16 @@ public class MainActivity extends BaseDrawerActivity implements ActivityCompat.O
             }
 
         });
-        // changing action bar color
-//        getActionBar().setBackgroundDrawable(
-  //              new ColorDrawable(Color.parseColor("#1b1b1b")));
 
         // Creating volley request obj
-        Log.i("Before sending","request");
         JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, url,null, new
 
                 Response.Listener<JSONObject>() {
 
                     @Override
                     public void onResponse(JSONObject response) {
-                        Log.i("Inside","response");
                         try {
                             JSONArray obj1 = response.getJSONArray("restaurants");
-                             Log.i("JSONResponse",response.toString());
-                            Log.d(TAG, obj1.toString());
                             hidePDialog();
 
                             // Parsing json
@@ -200,12 +183,6 @@ public class MainActivity extends BaseDrawerActivity implements ActivityCompat.O
 
 
                                 JSONObject obj = obj1.getJSONObject(i);
-                              /*  Movie movie = new Movie();
-                                movie.setTitle(obj.getString("title"));
-                                movie.setThumbnailUrl(obj.getString("image"));
-                                movie.setRating(((Number) obj.get("rating"))
-                                        .doubleValue());
-                                movie.setYear(obj.getInt("releaseYear"));*/
                                 Restaurant restaurant = new Restaurant();
                                 restaurant.setRestaurantId(obj.getString("restaurantId"));
                                 restaurant.setName(obj.getString("name"));
@@ -213,7 +190,6 @@ public class MainActivity extends BaseDrawerActivity implements ActivityCompat.O
                                 restaurant.setOpensAt(obj.getString("opensAt"));
                                 restaurant.setClosesAt(obj.getString("closesAt"));
 
-                                // Genre is json array
                                 JSONArray genreArry = obj.getJSONArray("attributes");
                                 ArrayList<String> genre = new ArrayList<String>();
                                 for (int j = 0; j < genreArry.length(); j++) {
@@ -223,7 +199,6 @@ public class MainActivity extends BaseDrawerActivity implements ActivityCompat.O
                                 attributes = genre.toArray(attributes);
                                 restaurant.setAttributes(attributes);
 
-                                // adding movie to movies array
                                 restaurantList.add(restaurant);
 
                             }
