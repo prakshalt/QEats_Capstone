@@ -58,8 +58,27 @@ public class MainActivity extends BaseDrawerActivity implements ActivityCompat.O
     private List<Restaurant> restaurantList = new ArrayList<Restaurant>();
     private ListView listView;
     private CustomListAdapter adapter;
-    private float latitude,longitude;
     int cLocationPerm,fLocationPerm;
+    public static float  latitude,longitude;
+
+
+
+
+    public static void setLatitude(float lat){
+        latitude = lat;
+    }
+
+    public static void setLongitude(float longit) {
+        longitude = longit;
+    }
+
+    public static float getLatitude() {
+        return latitude;
+    }
+
+    public static float getLongitude() {
+        return longitude;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,11 +126,11 @@ public class MainActivity extends BaseDrawerActivity implements ActivityCompat.O
                     @Override public void onNewLocationAvailable(SingleShotLocationProvider.GPSCoordinates location) {
                         Log.d("Location", "my location is " + location.toString());
                         Log.i("Latitude",Float.toString(location.latitude));
-                        latitude = location.latitude;
-                        longitude = location.longitude;
+                        setLatitude(location.latitude);
+                        setLongitude(location.longitude);
                     }
                 });
-        url += Float.toString(latitude) + "&longitude=" + Float.toString(longitude);
+        url += String.valueOf(getLatitude()) + "&longitude=" + String.valueOf(getLongitude());
         listView = (ListView) findViewById(R.id.list);
         adapter = new CustomListAdapter(this, restaurantList);
         listView.setAdapter(adapter);

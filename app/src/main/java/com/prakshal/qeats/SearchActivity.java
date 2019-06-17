@@ -31,7 +31,23 @@ public class SearchActivity extends BaseDrawerActivity implements ActivityCompat
     private List<Restaurant> restaurantList = new ArrayList<Restaurant>();
     private ListView listView;
     private CustomListAdapter adapter;
-    private float latitude,longitude;
+    public static float  latitude,longitude;
+
+    public static void setLatitude(float lat){
+        latitude = lat;
+    }
+
+    public static void setLongitude(float longit) {
+        longitude = longit;
+    }
+
+    public static float getLatitude() {
+        return latitude;
+    }
+
+    public static float getLongitude() {
+        return longitude;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,12 +58,14 @@ public class SearchActivity extends BaseDrawerActivity implements ActivityCompat
                     @Override public void onNewLocationAvailable(SingleShotLocationProvider.GPSCoordinates location) {
                         Log.d("Location", "my location is " + location.toString());
                         Log.i("Latitude",Float.toString(location.latitude));
-                        latitude = location.latitude;
-                        longitude = location.longitude;
+
+                        setLatitude(location.latitude);
+                        setLongitude(location.longitude);
                      //   url+=Float.toString(location.latitude)+"longitude="+Float.toString(location.longitude)+"searchFor=Hot";
                     }
                 });
-        url += Float.toString(latitude) + "&longitude=" + Float.toString(longitude)+"searchFor=Hot";
+        Log.i("Location",Float.toString(getLatitude()));
+        url += String.valueOf(getLatitude()) + "&longitude=" + String.valueOf(getLongitude())+"&searchFor=Hot";
         listView = (ListView) findViewById(R.id.searchlist);
         adapter = new CustomListAdapter(this, restaurantList);
         listView.setAdapter(adapter);
@@ -154,4 +172,6 @@ public class SearchActivity extends BaseDrawerActivity implements ActivityCompat
         getMenuInflater().inflate(R.menu.mymenu, menu);
         return true;
     }
+
+
 }
