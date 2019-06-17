@@ -28,7 +28,7 @@ import java.util.List;
 
 public class ShowRestaurantMenuActivity extends BaseDrawerActivity implements ActivityCompat.OnRequestPermissionsResultCallback {
 
-    private final String ip= "35.200.159.249";
+    private String ip="35.200.227.34";
     private String url = "http://"+ip+":8081/qeats/v1/menu?restaurantId=";//21.724216&longitude=73.01525";
     private ProgressDialog pDialog;
     private List<Item> restaurantList = new ArrayList<>();
