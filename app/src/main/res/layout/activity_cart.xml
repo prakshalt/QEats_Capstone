@@ -17,5 +17,11 @@
         android:layout_height="wrap_content"
         android:textColor="#FFF"
         android:id="@+id/carttotal"/>
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/orderbtn"
+        android:text="Order"
+        android:layout_below="@id/carttotal"/>
 
 </RelativeLayout>

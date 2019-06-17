@@ -26,7 +26,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SearchActivity extends BaseDrawerActivity implements ActivityCompat.OnRequestPermissionsResultCallback{
-    private String url = "http://35.200.159.249:8081/qeats/v1/restaurants?latitude=";//21.724216&longitude=73.01525";
+    private String ip="35.200.227.34";
+    private String url = "http://"+ip+":8081/qeats/v1/restaurants?latitude=";//21.724216&longitude=73.01525";
     private ProgressDialog pDialog;
     private List<Restaurant> restaurantList = new ArrayList<Restaurant>();
     private ListView listView;
@@ -70,6 +71,10 @@ public class SearchActivity extends BaseDrawerActivity implements ActivityCompat
         adapter = new CustomListAdapter(this, restaurantList);
         listView.setAdapter(adapter);
 
+    }
+
+    public void sendRequest(){
+
         pDialog = new ProgressDialog(this);
         // Showing progress dialog before making http request
         pDialog.setMessage("Loading...");
@@ -84,7 +89,7 @@ public class SearchActivity extends BaseDrawerActivity implements ActivityCompat
                         try {
                             JSONArray obj1 = response.getJSONArray("restaurants");
                             Log.i("JSONResponse",response.toString());
-                           // Log.d(TAG, obj1.toString());
+                            // Log.d(TAG, obj1.toString());
                             hidePDialog();
 
                             // Parsing json
@@ -132,7 +137,7 @@ public class SearchActivity extends BaseDrawerActivity implements ActivityCompat
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.i("inside","errorresponse");
-              //  VolleyLog.d(TAG, "Error: " + error.getClass());
+                //  VolleyLog.d(TAG, "Error: " + error.getClass());
                 error.printStackTrace();
                 hidePDialog();
 
@@ -145,7 +150,6 @@ public class SearchActivity extends BaseDrawerActivity implements ActivityCompat
         // Adding request to request queue
         AppController.getInstance().addToRequestQueue(obreq);
     }
-
     @Override
     protected void onResume() {
         super.onResume();

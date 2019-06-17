@@ -122,7 +122,7 @@ public class CustomMenuListAdapter extends BaseAdapter {
                 genreStr.length() - 2) : genreStr;
         genre.setText(genreStr);
 
-        String ip= "35.200.159.249";
+        String ip="35.200.227.34";
         String geturl = "http://"+ip+":8081/qeats/v1/cart?userId=Prakshal";
 
 
@@ -175,7 +175,7 @@ public class CustomMenuListAdapter extends BaseAdapter {
     }
 
     public String sendAddToCartRequest(final String cartid,final String itemId,final String restId){
-        String ip= "35.200.159.249";
+        String ip="35.200.227.34";
        /* String geturl = "http://"+ip+":8081/qeats/v1/cart?userId=Prakshal";
 
 

@@ -29,6 +29,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
@@ -53,7 +54,8 @@ public class MainActivity extends BaseDrawerActivity implements ActivityCompat.O
 
 
     // Movies json url
-    private String url = "http://35.200.159.249:8081/qeats/v1/restaurants?latitude=";//21.724216&longitude=73.01525";
+    private String ip="35.200.227.34";
+    private String url = "http://"+ip+":8081/qeats/v1/restaurants?latitude=";//21.724216&longitude=73.01525";
     private ProgressDialog pDialog;
     private List<Restaurant> restaurantList = new ArrayList<Restaurant>();
     private ListView listView;
@@ -118,6 +120,15 @@ public class MainActivity extends BaseDrawerActivity implements ActivityCompat.O
                         .show();
             }
         }
+        try {
+            int off = Settings.Secure.getInt(getContentResolver(), Settings.Secure.LOCATION_MODE);
+            if(off==0){
+                Intent onGPS = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                startActivity(onGPS);
+            }
+        } catch (Exception e){
+
+        }
 
         //mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         //Location location = mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,0,0,this);
@@ -155,9 +166,9 @@ public class MainActivity extends BaseDrawerActivity implements ActivityCompat.O
                 String restId = restaurant.getRestaurantId();
 
                 // Show Alert
-                Toast.makeText(getApplicationContext(),
-                        "Position :"+itemPosition+"  ListItem : " +restId , Toast.LENGTH_LONG)
-                        .show();
+              //  Toast.makeText(getApplicationContext(),
+                //        "Position :"+itemPosition+"  ListItem : " +restId , Toast.LENGTH_LONG)
+                  //      .show();
                 Intent intent = new Intent(getBaseContext(), ShowRestaurantMenuActivity.class);
                 intent.putExtra("RESTAURANT_ID", restId);
                 intent.putExtra("RESTAURANT_NAME",restaurant.getName());
