@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.prakshal.qeats.model.Cart;
 import com.prakshal.qeats.model.Item;
+import com.prakshal.qeats.model.Menu;
 import com.prakshal.qeats.model.Order;
 import com.prakshal.qeats.model.Restaurant;
 import com.prakshal.qeats.model.Status;
@@ -79,11 +80,9 @@ public class Parser {
         restaurant.setImageUrl(restaurantJsonObject.getString("imageUrl"));
         restaurant.setOpensAt(restaurantJsonObject.getString("opensAt"));
         restaurant.setClosesAt(restaurantJsonObject.getString("closesAt"));
+        restaurant.setAttributes(getAtttributesFromJson(
+                restaurantJsonObject.getJSONArray("attributes")));
 
-        if(restaurantJsonObject.getJSONArray("attributes") != null){
-            restaurant.setAttributes(getAtttributesFromJson(
-                    restaurantJsonObject.getJSONArray("attributes")));
-        }
         return restaurant;
     }
 
@@ -123,5 +122,16 @@ public class Parser {
         //cart.setRestaurant(getRestaurantFromJson(orderJsonObject.getJSONObject("restaurant")));
         return cart;
 
+    }
+
+    public static Menu getMenuFromJson(JSONObject menuJsonObject) throws JSONException {
+        Menu menu = new Menu();
+        JSONArray items = menuJsonObject.getJSONArray("items");
+        for (int j = 0; j < items.length(); j++) {
+            Item item = getItemFromJson(items.getJSONObject(j));
+            menu.getItems().add(item);
+        }
+        menu.setRestaurantId(menuJsonObject.getString("restaurantId"));
+        return menu;
     }
 }

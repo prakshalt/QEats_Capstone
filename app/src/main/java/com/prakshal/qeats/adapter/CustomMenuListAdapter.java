@@ -13,17 +13,19 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.VolleyLog;
-import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.prakshal.qeats.R;
 import com.prakshal.qeats.app.AppController;
+import com.prakshal.qeats.model.Cart;
 import com.prakshal.qeats.model.Item;
 import com.prakshal.qeats.utils.Constants;
+import com.prakshal.qeats.utils.Parser;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -36,28 +38,29 @@ import java.util.Map;
 public class CustomMenuListAdapter extends BaseAdapter {
     private Activity activity;
     private LayoutInflater inflater;
-    private List<Item> menuItems;
+    private List<Item> items;
     View view;
     private String respStr;
     private String cartId;
     private String restId;
     private ProgressDialog pDialog;
-    ImageLoader imageLoader = AppController.getInstance().getImageLoader();
+    private Cart cart;
 
-    public CustomMenuListAdapter(Activity activity, List<Item> menuItems,String Restid) {
+    public CustomMenuListAdapter(Activity activity, List<Item> items, String restId, Cart cart) {
         this.activity = activity;
-        this.menuItems = menuItems;
-        this.restId=Restid;
+        this.restId = restId;
+        this.items = items;
+        this.cart = cart;
     }
 
     @Override
     public int getCount() {
-        return menuItems.size();
+        return items.size();
     }
 
     @Override
     public Object getItem(int location) {
-        return menuItems.get(location);
+        return items.get(location);
     }
 
     @Override
@@ -66,7 +69,7 @@ public class CustomMenuListAdapter extends BaseAdapter {
     }
 
     @Override
-    public View getView(int position, View convertView, final ViewGroup parent) {
+    public View getView(final int position, View convertView, final ViewGroup parent) {
         view = convertView;
         if (inflater == null)
             inflater = (LayoutInflater) activity
@@ -74,119 +77,151 @@ public class CustomMenuListAdapter extends BaseAdapter {
         if (convertView == null)
             convertView = inflater.inflate(R.layout.list_row_menu, null);
 
-        if (imageLoader == null)
-            imageLoader = AppController.getInstance().getImageLoader();
-        final TextView title = (TextView) convertView.findViewById(R.id.itemname);
-        final TextView Itemidtv = (TextView) convertView.findViewById(R.id.itemid);
-        TextView timings = (TextView) convertView.findViewById(R.id.price);
-        TextView genre = (TextView) convertView.findViewById(R.id.attributes);
+        TextView itemNameTv = (TextView) convertView.findViewById(R.id.item_name);
 
-        Item m = menuItems.get(position);
+        TextView priceTv = convertView.findViewById(R.id.price);
 
-        title.setText(m.getName());
+        Item item = items.get(position);
 
-        Itemidtv.setText(m.getItemId());
+        itemNameTv.setText(item.getName());
 
-        timings.setText("Price: " + String.valueOf(m.getPrice()));
-        String genreStr = "";
-        for (String str : m.getAttributes()) {
-            genreStr += str + ", ";
-        }
-        genreStr = genreStr.length() > 0 ? genreStr.substring(0,
-                genreStr.length() - 2) : genreStr;
-        genre.setText(genreStr);
+        priceTv.setText(String.format("\u20B9 %s", String.valueOf(item.getPrice())));
 
-        String ip="35.200.227.34";
-        String url = Constants.API_ENDPOINT + Constants.CART_API;
-        //String geturl = "http://"+ip+":8081/qeats/v1/cart?userId=Prakshal";
+        Button addToCartBtn = convertView.findViewById(R.id.add_to_cart_btn);
 
+        Button removeFromCartBtn = convertView.findViewById(R.id.remove_from_cart_btn);
 
-        JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, url,null, new
+        final String userId = AppController.getInstance().getUserId();
 
-                Response.Listener<JSONObject>() {
-
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        Log.i("Inside","response");
-                        Log.i("JSONResponse",response.toString());
-                        try {
-                            Log.i(response.getString("id"),"h");
-                            cartId = response.getString("id");
-
-                        }catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }, new Response.ErrorListener() {
+        removeFromCartBtn.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.i("inside","errorresponse");
-                // VolleyLog.d(TAG, "Error: " + error.getClass());
-                error.printStackTrace();
-
+            public void onClick(View v) {
+                if(cart != null){
+                    removeFromCart(cart.getId(), items.get(position).getId(), restId, parent);
+                } else{
+                    fetchCart(userId);
+                    Toast.makeText(parent.getContext(),"Item not removed to cart",Toast.LENGTH_LONG).show();
+                }
             }
         });
-
-        AppController.getInstance().addToRequestQueue(obreq);
-
-
-        Button addToCartBtn= (Button)convertView.findViewById(R.id.add_to_cart_btn);
 
         addToCartBtn.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                String resp = sendAddToCartRequest(cartId,Itemidtv.getText().toString(),restId);
-                   Toast.makeText(parent.getContext(),"Item added to cart",Toast.LENGTH_LONG).show();
+                if(cart != null){
+                    addToCart(cart.getId(), items.get(position).getId(), restId, parent);
+                } else{
+                    fetchCart(userId);
+                    Toast.makeText(parent.getContext(),"Item not added to cart",Toast.LENGTH_LONG).show();
+                }
             }
         });
 
         return convertView;
     }
 
-    public String sendAddToCartRequest(final String cartid,final String itemId,final String restId){
-        String ip="35.200.227.34";
 
+    public void addToCart(final String cartId, final String itemId, final String restId, final ViewGroup parent){
 
-        String url = "http://"+ip+":8081/qeats/v1/cart/item";
-        final String requestBody="{\"cartId\":\""+cartId+"\","+
-                "\"itemId\":\""+itemId+"\",\"restaurantId\":\""+restId+"\"}";
+        String url = Constants.API_ENDPOINT + Constants.CART_ITEM_API;
 
-        StringRequest strRequest = new StringRequest(Request.Method.POST, url,
-                new Response.Listener<String>()
-                {
-                    @Override
-                    public void onResponse(String response)
-                    {
-                        Log.i("response",response);
-                    }
-                },
-                new Response.ErrorListener()
-                {
-                    @Override
-                    public void onErrorResponse(VolleyError error)
-                    {
-                    }
-                })
-        {
-           @Override
-           public Map<String, String> getHeaders() throws AuthFailureError {
-               HashMap<String, String> headers = new HashMap<>();
-               headers.put("Content-Type", "application/json; charset=utf-8");
-               return headers;
-           }
-            @Override
-            public byte[] getBody() throws AuthFailureError {
-                try {
-                    return requestBody == null ? null : requestBody.getBytes("utf-8");
-                } catch (UnsupportedEncodingException uee) {
-                    VolleyLog.wtf("Unsupported Encoding while trying to get the bytes of %s using %s", requestBody, "utf-8");
-                    return null;
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("cartId", cartId);
+            jsonObject.put("itemId", itemId);
+            jsonObject.put("restaurantId", restId);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        JsonObjectRequest strRequest = new JsonObjectRequest(Request.Method.POST, url, jsonObject,
+            new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
+                    Log.i("response",response.toString());
+                    Toast.makeText(parent.getContext(),"Item added to cart.",Toast.LENGTH_LONG).show();
                 }
-            }
-        };
+            },
+            new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Toast.makeText(parent.getContext(),"Item not added to cart.",Toast.LENGTH_LONG).show();
+                }
+            });
 
         AppController.getInstance().addToRequestQueue(strRequest);
-        return respStr;
+    }
+
+    public void removeFromCart(final String cartId, final String itemId, final String restId, final ViewGroup parent){
+
+        String url = Constants.API_ENDPOINT + Constants.CART_ITEM_API;
+
+
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("cartId", cartId);
+            jsonObject.put("itemId", itemId);
+            jsonObject.put("restaurantId", restId);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        JsonObjectRequest strRequest = new JsonObjectRequest(Request.Method.DELETE, url, jsonObject,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Log.i("response",response.toString());
+                        Toast.makeText(parent.getContext(),"Item removed from cart.",Toast.LENGTH_LONG).show();
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(parent.getContext(),"Item not removed to cart.",Toast.LENGTH_LONG).show();
+                    }
+                });
+
+        AppController.getInstance().addToRequestQueue(strRequest);
+    }
+
+    public void fetchCart(final String userId){
+
+
+        String url = Constants.API_ENDPOINT + Constants.CART_API;
+
+        url += "?userId=" + userId;
+
+        JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, url, null, new
+
+                Response.Listener<JSONObject>() {
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            Log.i("CART_API_RESPONSE", response.toString());
+                            Cart temp = Parser.getCartFromJson(response);
+                            //if(temp.getItems().size() == 0){
+                               // Toast.makeText(getApplicationContext(), "Empty cart, add some items." , Toast.LENGTH_SHORT).show();
+                           // }
+                            cart = temp;
+                        }catch (JSONException e) {
+                            e.printStackTrace();
+                           // Toast.makeText(getApplicationContext(), "Error fetching data." , Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                error.printStackTrace();
+                //Toast.makeText(getApplicationContext(), "Error fetching data." , Toast.LENGTH_SHORT).show();
+            }
+        });
+        obreq.setRetryPolicy(new DefaultRetryPolicy(
+                10000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        // Adding request to request queue
+        AppController.getInstance().addToRequestQueue(obreq);
     }
 
     private void hidePDialog() {

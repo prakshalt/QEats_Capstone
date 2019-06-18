@@ -1,64 +1,81 @@
 package com.prakshal.qeats;
 
 import android.app.ProgressDialog;
-import android.net.Uri;
-import android.support.v4.app.ActivityCompat;
-import android.support.v7.app.AppCompatActivity;
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.util.Log;
-import android.view.Menu;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.prakshal.qeats.adapter.CustomMenuListAdapter;
 import com.prakshal.qeats.app.AppController;
+import com.prakshal.qeats.login.LoginActivity;
+import com.prakshal.qeats.model.Cart;
 import com.prakshal.qeats.model.Item;
-import com.prakshal.qeats.model.Restaurant;
+import com.prakshal.qeats.model.Menu;
 import com.prakshal.qeats.utils.Constants;
+import com.prakshal.qeats.utils.Parser;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ShowRestaurantMenuActivity extends BaseDrawerActivity implements ActivityCompat.OnRequestPermissionsResultCallback {
 
-    private String ip="35.200.227.34";
-    private String url = Constants.API_ENDPOINT + Constants.MENU_API;
-    //private String url = "http://"+ip+":8081/qeats/v1/menu?restaurantId=";//21.724216&longitude=73.01525";
     private ProgressDialog pDialog;
-    private List<Item> restaurantList = new ArrayList<>();
+    private List<Item> items = new ArrayList<>();
     private ListView listView;
     private CustomMenuListAdapter adapter;
     private String restId;
     private String restName;
+    private Cart cart;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getLayoutInflater().inflate(R.layout.activity_show_restaurant_menu, frameLayout);
 
-
         restId = getIntent().getStringExtra("RESTAURANT_ID");
         restName = getIntent().getStringExtra("RESTAURANT_NAME");
 
-        url = "?restaurantId=" + restId;
-        listView = (ListView) findViewById(R.id.menus);
-        adapter = new CustomMenuListAdapter(ShowRestaurantMenuActivity.this, restaurantList,restId);
-        listView.setAdapter(adapter);
+        getSupportActionBar().setTitle(restName);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        String userId = AppController.getInstance().getUserId();
+        if(userId == null){
+            startActivity(new Intent(this, LoginActivity.class));
+        } else{
+            listView = findViewById(R.id.menu_items);
+            adapter = new CustomMenuListAdapter(ShowRestaurantMenuActivity.this, items, restId, cart);
+            listView.setAdapter(adapter);
+            fetchData(restId, userId);
+        }
+    }
+
+    public void fetchData(final String restId, final String userId){
 
         pDialog = new ProgressDialog(this);
         // Showing progress dialog before making http request
         pDialog.setMessage("Loading...");
         pDialog.show();
+        fetchRestaurantMenu(restId);
+        //fetchCart(userId);
+        hidePDialog();
+    }
+
+    public void fetchRestaurantMenu(final String restId){
+
+        String url = Constants.API_ENDPOINT + Constants.MENU_API;
+
+        url += "?restaurantId=" + restId;
 
         JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, url,null, new
 
@@ -67,37 +84,12 @@ public class ShowRestaurantMenuActivity extends BaseDrawerActivity implements Ac
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
-                            JSONObject obj2 = response.getJSONObject("menu");
-                            JSONArray obj1 = obj2.getJSONArray("items");
-                            hidePDialog();
-
-                            // Parsing json
-                            for (int i = 0; i < obj1.length(); i++) {
-
-
-                                JSONObject obj = obj1.getJSONObject(i);
-                                Item item = new Item();
-                                item.setItemId(obj.getString("itemId"));
-                                item.setName(obj.getString("name"));
-                                item.setPrice(obj.getInt("price"));
-                                item.setImageUrl(obj.getString("imageUrl"));
-
-                                JSONArray genreArry = obj.getJSONArray("attributes");
-                                ArrayList<String> genre = new ArrayList<String>();
-                                for (int j = 0; j < genreArry.length(); j++) {
-                                    genre.add((String) genreArry.get(j));
-                                }
-                                item.setAttributes(genre);
-
-                                restaurantList.add(item);
-
-
-                            }
+                            Log.i("Menu Json", response.toString());
+                            Menu menu = Parser.getMenuFromJson(response.getJSONObject("menu"));
+                            items.addAll(menu.getItems());
                         }catch (JSONException e) {
                             e.printStackTrace();
                         }
-
-
                         // notifying list adapter about data changes
                         // so that it renders the list view with updated data
                         adapter.notifyDataSetChanged();
@@ -107,7 +99,6 @@ public class ShowRestaurantMenuActivity extends BaseDrawerActivity implements Ac
             public void onErrorResponse(VolleyError error) {
                 Log.i("inside","errorresponse");
                 error.printStackTrace();
-                hidePDialog();
 
             }
         });
@@ -118,8 +109,10 @@ public class ShowRestaurantMenuActivity extends BaseDrawerActivity implements Ac
         // Adding request to request queue
 
         AppController.getInstance().addToRequestQueue(obreq);
-
     }
+
+
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -140,10 +133,4 @@ public class ShowRestaurantMenuActivity extends BaseDrawerActivity implements Ac
         }
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.mymenu, menu);
-        return true;
-    }
 }

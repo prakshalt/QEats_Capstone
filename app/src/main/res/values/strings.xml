@@ -24,5 +24,8 @@
     <string name="cancel_order">CANCEL ORDER</string>
     <string name="you_rated">YOU RATED</string>
     <string name="place_order">PLACE ORDER</string>
+    <string name="remove">-</string>
+    <string name="add">+</string>
+    <string name="zero">0</string>
 
 </resources>
