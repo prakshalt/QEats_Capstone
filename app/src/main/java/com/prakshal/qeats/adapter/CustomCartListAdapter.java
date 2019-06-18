@@ -15,15 +15,16 @@ import com.prakshal.qeats.model.Item;
 
 import java.util.List;
 
+
 public class CustomCartListAdapter extends BaseAdapter {
     private Activity activity;
     private LayoutInflater inflater;
     private List<Item> items;
     ImageLoader imageLoader = AppController.getInstance().getImageLoader();
 
-    public CustomCartListAdapter(Activity activity, List<Item> movieItems) {
+    public CustomCartListAdapter(Activity activity, List<Item> items) {
         this.activity = activity;
-        this.items = movieItems;
+        this.items = items;
     }
 
     @Override

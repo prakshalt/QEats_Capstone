@@ -5,9 +5,6 @@
     android:background="@drawable/list_row_selector"
     android:padding="8dp" >
 
-
-
-    <!-- Movie Title -->
     <TextView
         android:id="@+id/cartitemname"
         android:layout_width="wrap_content"
@@ -17,7 +14,6 @@
         android:layout_alignParentLeft="true"
         android:textStyle="bold" />
 
-    <!-- Rating -->
     <TextView
         android:id="@+id/pricecartitem"
         android:textColor="#000"
@@ -26,6 +22,5 @@
         android:layout_alignParentRight="true"
         android:textSize="@dimen/rating" />
 
-    <!-- Genre -->
 
 </RelativeLayout>

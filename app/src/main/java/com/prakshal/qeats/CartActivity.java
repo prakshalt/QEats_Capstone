@@ -2,10 +2,9 @@ package com.prakshal.qeats;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
@@ -22,10 +21,8 @@ import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.prakshal.qeats.adapter.CustomCartListAdapter;
-import com.prakshal.qeats.adapter.CustomListAdapter;
 import com.prakshal.qeats.app.AppController;
 import com.prakshal.qeats.model.Item;
-import com.prakshal.qeats.model.Restaurant;
 import com.prakshal.qeats.utils.Constants;
 
 import org.json.JSONArray;
@@ -40,9 +37,8 @@ import java.util.List;
 import java.util.Map;
 
 public class CartActivity extends BaseDrawerActivity implements ActivityCompat.OnRequestPermissionsResultCallback {
-    private String ip="35.200.227.34";
+
     private String url = Constants.API_ENDPOINT + Constants.CART_API;
-    //private String url = "http://"+ip+":8081/qeats/v1/cart?userId=Prakshal";//21.724216&longitude=73.01525";
     private ProgressDialog pDialog;
     private List<Item> itemList = new ArrayList<>();
     private List<Integer> priceList = new ArrayList<>();
@@ -73,23 +69,21 @@ public class CartActivity extends BaseDrawerActivity implements ActivityCompat.O
         adapter = new CustomCartListAdapter(this, itemList);
         listView.setAdapter(adapter);
         pDialog = new ProgressDialog(this);
-        // Showing progress dialog before making http request
+        // Showing progress dialog before making http request(i.e Loading anim)
         pDialog.setMessage("Loading...");
         pDialog.show();
-        Log.i("before","req");
+        //This is used to send request for getting a JSON object.
         JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, url,null, new
 
                 Response.Listener<JSONObject>() {
 
                     @Override
                     public void onResponse(JSONObject response) {
-                        Log.i("Inside","response");
                         try {
-                            JSONArray obj1 = response.getJSONArray("items");
+                            JSONArray obj1 = response.getJSONArray("items"); //This gives array of objects
                             Log.i("JSONResponse",response.toString());
-                            cartId = response.getString("id");
-                            //Log.d(TAG, obj1.toString());
-                            hidePDialog();
+                            cartId = response.getString("id"); //use getters on response to get value of specific key
+                            hidePDialog();//stop loading anim
 
                             // Parsing json
                             for (int i = 0; i < obj1.length(); i++) {
@@ -102,14 +96,12 @@ public class CartActivity extends BaseDrawerActivity implements ActivityCompat.O
                                 item.setImageUrl(obj.getString("imageUrl"));
                                 item.setPrice(obj.getInt("price"));
                                 addTotal(item.getPrice());
-                                //total+=item.getPrice();
                                 JSONArray genreArry = obj.getJSONArray("attributes");
                                 ArrayList<String> genre = new ArrayList<String>();
                                 for (int j = 0; j < genreArry.length(); j++) {
                                     genre.add((String) genreArry.get(j));
                                 }
                                 item.setAttributes(genre);
-
                                 itemList.add(item);
                                 priceList.add(obj.getInt("price"));
                             }
@@ -138,6 +130,7 @@ public class CartActivity extends BaseDrawerActivity implements ActivityCompat.O
         TextView carttotal = (TextView) findViewById(R.id.carttotal);
         carttotal.setText("Total="+String.valueOf(getTotal()));
 
+        //Order Button
         Button orderBtn = (Button) findViewById(R.id.orderbtn);
         orderBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -145,7 +138,6 @@ public class CartActivity extends BaseDrawerActivity implements ActivityCompat.O
                 String response = sendOrder(cartId);
             }
         });
-       // recreate();
 
     }
 
@@ -161,7 +153,6 @@ public class CartActivity extends BaseDrawerActivity implements ActivityCompat.O
                     {
                         Log.i("response",response);
                         respStr = response;
-                        // Toast.makeText(getApplicationContext(), response, Toast.LENGTH_SHORT).show();
                     }
                 },
                 new Response.ErrorListener()
@@ -169,8 +160,7 @@ public class CartActivity extends BaseDrawerActivity implements ActivityCompat.O
                     @Override
                     public void onErrorResponse(VolleyError error)
                     {
-                        // Log.i("error",error.getMessage());
-                        //Toast.makeText(getApplicationContext(), error.toString(), Toast.LENGTH_SHORT).show();
+
                     }
                 })
         {
@@ -198,7 +188,6 @@ public class CartActivity extends BaseDrawerActivity implements ActivityCompat.O
         super.onResume();
         // to check current activity in the navigation drawer
         navigationView.getMenu().getItem(2).setChecked(true);
-   //     recreate();
         final Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override

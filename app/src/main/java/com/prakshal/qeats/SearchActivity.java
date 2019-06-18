@@ -62,7 +62,6 @@ public class SearchActivity extends BaseDrawerActivity implements ActivityCompat
 
                         setLatitude(location.latitude);
                         setLongitude(location.longitude);
-                     //   url+=Float.toString(location.latitude)+"longitude="+Float.toString(location.longitude)+"searchFor=Hot";
                     }
                 });
         Log.i("Location",Float.toString(getLatitude()));
@@ -70,6 +69,7 @@ public class SearchActivity extends BaseDrawerActivity implements ActivityCompat
         listView = (ListView) findViewById(R.id.searchlist);
         adapter = new CustomListAdapter(this, restaurantList);
         listView.setAdapter(adapter);
+        sendRequest();
 
     }
 
@@ -85,11 +85,9 @@ public class SearchActivity extends BaseDrawerActivity implements ActivityCompat
 
                     @Override
                     public void onResponse(JSONObject response) {
-                        Log.i("Inside","response");
                         try {
                             JSONArray obj1 = response.getJSONArray("restaurants");
                             Log.i("JSONResponse",response.toString());
-                            // Log.d(TAG, obj1.toString());
                             hidePDialog();
 
                             // Parsing json
@@ -97,12 +95,6 @@ public class SearchActivity extends BaseDrawerActivity implements ActivityCompat
 
 
                                 JSONObject obj = obj1.getJSONObject(i);
-                              /*  Movie movie = new Movie();
-                                movie.setTitle(obj.getString("title"));
-                                movie.setThumbnailUrl(obj.getString("image"));
-                                movie.setRating(((Number) obj.get("rating"))
-                                        .doubleValue());
-                                movie.setYear(obj.getInt("releaseYear"));*/
                                 Restaurant restaurant = new Restaurant();
                                 restaurant.setRestaurantId(obj.getString("restaurantId"));
                                 restaurant.setName(obj.getString("name"));
@@ -110,7 +102,6 @@ public class SearchActivity extends BaseDrawerActivity implements ActivityCompat
                                 restaurant.setOpensAt(obj.getString("opensAt"));
                                 restaurant.setClosesAt(obj.getString("closesAt"));
 
-                                // Genre is json array
                                 JSONArray genreArry = obj.getJSONArray("attributes");
                                 ArrayList<String> genre = new ArrayList<String>();
                                 for (int j = 0; j < genreArry.length(); j++) {
@@ -120,7 +111,6 @@ public class SearchActivity extends BaseDrawerActivity implements ActivityCompat
                                 attributes = genre.toArray(attributes);
                                 restaurant.setAttributes(attributes);
 
-                                // adding movie to movies array
                                 restaurantList.add(restaurant);
 
                             }

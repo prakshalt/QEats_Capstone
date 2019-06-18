@@ -22,11 +22,12 @@ public class CustomListAdapter extends BaseAdapter {
     private Activity activity;
     private LayoutInflater inflater;
     private List<Restaurant> restaurants;
+
     ImageLoader imageLoader = AppController.getInstance().getImageLoader();
 
-    public CustomListAdapter(Activity activity, List<Restaurant> movieItems) {
+    public CustomListAdapter(Activity activity, List<Restaurant> restaurants) {
         this.activity = activity;
-        this.restaurants = movieItems;
+        this.restaurants = restaurants;
     }
 
     @Override
@@ -62,7 +63,6 @@ public class CustomListAdapter extends BaseAdapter {
         TextView genre = (TextView) convertView.findViewById(R.id.genre);
         TextView ratings = (TextView) convertView.findViewById(R.id.releaseYear);
 
-        // getting movie data for the row
         Restaurant m = restaurants.get(position);
 
         // thumbnail image
