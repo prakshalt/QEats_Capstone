@@ -10,7 +10,7 @@ public class Cart {
     private String restaurantId = "";
     private String userId;
 
-    private List<Item> items = new ArrayList();
+    private List<Item> items = new ArrayList<>();
 
     private int total;
 

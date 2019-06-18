@@ -2,7 +2,6 @@ package com.prakshal.qeats.adapter;
 
 import com.prakshal.qeats.R;
 import com.prakshal.qeats.app.AppController;
-import com.prakshal.qeats.model.Movie;
 
 import java.util.List;
 
@@ -19,24 +18,25 @@ import com.android.volley.toolbox.NetworkImageView;
 import com.prakshal.qeats.model.Restaurant;
 
 public class CustomListAdapter extends BaseAdapter {
+
     private Activity activity;
     private LayoutInflater inflater;
-    private List<Restaurant> movieItems;
+    private List<Restaurant> restaurants;
     ImageLoader imageLoader = AppController.getInstance().getImageLoader();
 
     public CustomListAdapter(Activity activity, List<Restaurant> movieItems) {
         this.activity = activity;
-        this.movieItems = movieItems;
+        this.restaurants = movieItems;
     }
 
     @Override
     public int getCount() {
-        return movieItems.size();
+        return restaurants.size();
     }
 
     @Override
     public Object getItem(int location) {
-        return movieItems.get(location);
+        return restaurants.get(location);
     }
 
     @Override
@@ -63,7 +63,7 @@ public class CustomListAdapter extends BaseAdapter {
         TextView ratings = (TextView) convertView.findViewById(R.id.releaseYear);
 
         // getting movie data for the row
-        Restaurant m = movieItems.get(position);
+        Restaurant m = restaurants.get(position);
 
         // thumbnail image
         thumbNail.setImageUrl(m.getImageUrl(), imageLoader);

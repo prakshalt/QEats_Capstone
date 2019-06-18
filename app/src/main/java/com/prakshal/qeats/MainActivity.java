@@ -1,32 +1,11 @@
 package com.prakshal.qeats;
 
-import com.android.volley.DefaultRetryPolicy;
-import com.android.volley.Request;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.prakshal.qeats.adapter.CustomListAdapter;
-import com.prakshal.qeats.app.AppController;
-import com.prakshal.qeats.model.Movie;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.Manifest;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -39,11 +18,23 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.VolleyLog;
-import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.prakshal.qeats.adapter.CustomListAdapter;
+import com.prakshal.qeats.app.AppController;
 import com.prakshal.qeats.model.Restaurant;
+import com.prakshal.qeats.utils.Constants;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends BaseDrawerActivity implements ActivityCompat.OnRequestPermissionsResultCallback{ //implements LocationListener {
     //LocationManager mLocationManager;
@@ -55,7 +46,8 @@ public class MainActivity extends BaseDrawerActivity implements ActivityCompat.O
 
     // Movies json url
     private String ip="35.200.227.34";
-    private String url = "http://"+ip+":8081/qeats/v1/restaurants?latitude=";//21.724216&longitude=73.01525";
+    private String url = Constants.API_ENDPOINT + Constants.RESTAURANTS_API;
+    //private String url = "http://"+ip+":8081/qeats/v1/restaurants?latitude=";//21.724216&longitude=73.01525";
     private ProgressDialog pDialog;
     private List<Restaurant> restaurantList = new ArrayList<Restaurant>();
     private ListView listView;
@@ -141,7 +133,7 @@ public class MainActivity extends BaseDrawerActivity implements ActivityCompat.O
                         setLongitude(location.longitude);
                     }
                 });
-        url += String.valueOf(getLatitude()) + "&longitude=" + String.valueOf(getLongitude());
+        url += "?latitude=" + String.valueOf(getLatitude()) + "&longitude=" + String.valueOf(getLongitude());
         listView = (ListView) findViewById(R.id.list);
         adapter = new CustomListAdapter(this, restaurantList);
         listView.setAdapter(adapter);
@@ -200,12 +192,7 @@ public class MainActivity extends BaseDrawerActivity implements ActivityCompat.O
 
 
                                 JSONObject obj = obj1.getJSONObject(i);
-                              /*  Movie movie = new Movie();
-                                movie.setTitle(obj.getString("title"));
-                                movie.setThumbnailUrl(obj.getString("image"));
-                                movie.setRating(((Number) obj.get("rating"))
-                                        .doubleValue());
-                                movie.setYear(obj.getInt("releaseYear"));*/
+
                                 Restaurant restaurant = new Restaurant();
                                 restaurant.setRestaurantId(obj.getString("restaurantId"));
                                 restaurant.setName(obj.getString("name"));

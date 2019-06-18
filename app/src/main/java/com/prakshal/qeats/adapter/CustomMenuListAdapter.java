@@ -1,26 +1,5 @@
 package com.prakshal.qeats.adapter;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.DefaultRetryPolicy;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.VolleyLog;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.StringRequest;
-import com.prakshal.qeats.MainActivity;
-import com.prakshal.qeats.R;
-import com.prakshal.qeats.ShowRestaurantMenuActivity;
-import com.prakshal.qeats.app.AppController;
-import com.prakshal.qeats.model.Item;
-import com.prakshal.qeats.model.Movie;
-
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -33,13 +12,26 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.ImageLoader;
-import com.android.volley.toolbox.NetworkImageView;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
+import com.prakshal.qeats.R;
+import com.prakshal.qeats.app.AppController;
 import com.prakshal.qeats.model.Item;
+import com.prakshal.qeats.utils.Constants;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class CustomMenuListAdapter extends BaseAdapter {
     private Activity activity;
@@ -123,10 +115,11 @@ public class CustomMenuListAdapter extends BaseAdapter {
         genre.setText(genreStr);
 
         String ip="35.200.227.34";
-        String geturl = "http://"+ip+":8081/qeats/v1/cart?userId=Prakshal";
+        String url = Constants.API_ENDPOINT + Constants.CART_API;
+        //String geturl = "http://"+ip+":8081/qeats/v1/cart?userId=Prakshal";
 
 
-        JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, geturl,null, new
+        JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, url,null, new
 
                 Response.Listener<JSONObject>() {
 
@@ -252,7 +245,7 @@ public class CustomMenuListAdapter extends BaseAdapter {
             }*/
            @Override
            public Map<String, String> getHeaders() throws AuthFailureError {
-               HashMap<String, String> headers = new HashMap<String, String>();
+               HashMap<String, String> headers = new HashMap<>();
                headers.put("Content-Type", "application/json; charset=utf-8");
                return headers;
            }

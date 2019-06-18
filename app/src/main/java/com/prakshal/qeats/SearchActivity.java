@@ -1,9 +1,8 @@
 package com.prakshal.qeats;
 
 import android.app.ProgressDialog;
-import android.support.v4.app.ActivityCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.Menu;
 import android.widget.ListView;
@@ -12,11 +11,11 @@ import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.prakshal.qeats.adapter.CustomListAdapter;
 import com.prakshal.qeats.app.AppController;
 import com.prakshal.qeats.model.Restaurant;
+import com.prakshal.qeats.utils.Constants;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -27,7 +26,8 @@ import java.util.List;
 
 public class SearchActivity extends BaseDrawerActivity implements ActivityCompat.OnRequestPermissionsResultCallback{
     private String ip="35.200.227.34";
-    private String url = "http://"+ip+":8081/qeats/v1/restaurants?latitude=";//21.724216&longitude=73.01525";
+    private String url = Constants.API_ENDPOINT + Constants.RESTAURANTS_API;
+    //private String url = "http://"+ip+":8081/qeats/v1/restaurants?latitude=";//21.724216&longitude=73.01525";
     private ProgressDialog pDialog;
     private List<Restaurant> restaurantList = new ArrayList<Restaurant>();
     private ListView listView;

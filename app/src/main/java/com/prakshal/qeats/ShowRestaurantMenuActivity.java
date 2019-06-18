@@ -1,6 +1,7 @@
 package com.prakshal.qeats;
 
 import android.app.ProgressDialog;
+import android.net.Uri;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -18,18 +19,21 @@ import com.prakshal.qeats.adapter.CustomMenuListAdapter;
 import com.prakshal.qeats.app.AppController;
 import com.prakshal.qeats.model.Item;
 import com.prakshal.qeats.model.Restaurant;
+import com.prakshal.qeats.utils.Constants;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ShowRestaurantMenuActivity extends BaseDrawerActivity implements ActivityCompat.OnRequestPermissionsResultCallback {
 
     private String ip="35.200.227.34";
-    private String url = "http://"+ip+":8081/qeats/v1/menu?restaurantId=";//21.724216&longitude=73.01525";
+    private String url = Constants.API_ENDPOINT + Constants.MENU_API;
+    //private String url = "http://"+ip+":8081/qeats/v1/menu?restaurantId=";//21.724216&longitude=73.01525";
     private ProgressDialog pDialog;
     private List<Item> restaurantList = new ArrayList<>();
     private ListView listView;
@@ -42,9 +46,11 @@ public class ShowRestaurantMenuActivity extends BaseDrawerActivity implements Ac
         super.onCreate(savedInstanceState);
         getLayoutInflater().inflate(R.layout.activity_show_restaurant_menu, frameLayout);
 
+
         restId = getIntent().getStringExtra("RESTAURANT_ID");
         restName = getIntent().getStringExtra("RESTAURANT_NAME");
-        url +=  restId;
+
+        url = "?restaurantId=" + restId;
         listView = (ListView) findViewById(R.id.menus);
         adapter = new CustomMenuListAdapter(ShowRestaurantMenuActivity.this, restaurantList,restId);
         Log.i("adapter",adapter.toString());

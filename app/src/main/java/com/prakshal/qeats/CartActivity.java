@@ -26,6 +26,7 @@ import com.prakshal.qeats.adapter.CustomListAdapter;
 import com.prakshal.qeats.app.AppController;
 import com.prakshal.qeats.model.Item;
 import com.prakshal.qeats.model.Restaurant;
+import com.prakshal.qeats.utils.Constants;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -40,9 +41,10 @@ import java.util.Map;
 
 public class CartActivity extends BaseDrawerActivity implements ActivityCompat.OnRequestPermissionsResultCallback {
     private String ip="35.200.227.34";
-    private String url = "http://"+ip+":8081/qeats/v1/cart?userId=Prakshal";//21.724216&longitude=73.01525";
+    private String url = Constants.API_ENDPOINT + Constants.CART_API;
+    //private String url = "http://"+ip+":8081/qeats/v1/cart?userId=Prakshal";//21.724216&longitude=73.01525";
     private ProgressDialog pDialog;
-    private List<Item> itemList = new ArrayList<Item>();
+    private List<Item> itemList = new ArrayList<>();
     private List<Integer> priceList = new ArrayList<>();
    private ListView listView;
    private String cartId;
@@ -94,12 +96,6 @@ public class CartActivity extends BaseDrawerActivity implements ActivityCompat.O
 
 
                                 JSONObject obj = obj1.getJSONObject(i);
-                              /*  Movie movie = new Movie();
-                                movie.setTitle(obj.getString("title"));
-                                movie.setThumbnailUrl(obj.getString("image"));
-                                movie.setRating(((Number) obj.get("rating"))
-                                        .doubleValue());
-                                movie.setYear(obj.getInt("releaseYear"));*/
                                 Item item = new Item();
                                 item.setItemId(obj.getString("itemId"));
                                 item.setName(obj.getString("name"));
@@ -107,7 +103,6 @@ public class CartActivity extends BaseDrawerActivity implements ActivityCompat.O
                                 item.setPrice(obj.getInt("price"));
                                 addTotal(item.getPrice());
                                 //total+=item.getPrice();
-                                // Genre is json array
                                 JSONArray genreArry = obj.getJSONArray("attributes");
                                 ArrayList<String> genre = new ArrayList<String>();
                                 for (int j = 0; j < genreArry.length(); j++) {
@@ -115,15 +110,12 @@ public class CartActivity extends BaseDrawerActivity implements ActivityCompat.O
                                 }
                                 item.setAttributes(genre);
 
-                                // adding movie to movies array
                                 itemList.add(item);
                                 priceList.add(obj.getInt("price"));
                             }
                         }catch (JSONException e) {
                             e.printStackTrace();
                         }
-                        // notifying list adapter about data changes
-                        // so that it renders the list view with updated data
                         adapter.notifyDataSetChanged();
                     }
                 }, new Response.ErrorListener() {
@@ -158,8 +150,8 @@ public class CartActivity extends BaseDrawerActivity implements ActivityCompat.O
     }
 
     public String sendOrder(String cartId){
-        String url = "http://35.200.159.249:8081/qeats/v1/order";
-        final String requestBody="{\"cartId\":\""+cartId+"\"}";
+        String url = Constants.API_ENDPOINT + Constants.GET_ORDER_API;
+        final String requestBody="{\"cartId\":\"" + cartId + "\"}";
 
         StringRequest strRequest = new StringRequest(Request.Method.POST, url,
                 new Response.Listener<String>()

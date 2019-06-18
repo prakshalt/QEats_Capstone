@@ -1,15 +1,7 @@
 package com.prakshal.qeats.adapter;
 
-import com.prakshal.qeats.R;
-import com.prakshal.qeats.app.AppController;
-import com.prakshal.qeats.model.Item;
-import com.prakshal.qeats.model.Movie;
-
-import java.util.List;
-
 import android.app.Activity;
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,28 +9,31 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.android.volley.toolbox.ImageLoader;
-import com.android.volley.toolbox.NetworkImageView;
-import com.prakshal.qeats.model.Restaurant;
+import com.prakshal.qeats.R;
+import com.prakshal.qeats.app.AppController;
+import com.prakshal.qeats.model.Item;
+
+import java.util.List;
 
 public class CustomCartListAdapter extends BaseAdapter {
     private Activity activity;
     private LayoutInflater inflater;
-    private List<Item> movieItems;
+    private List<Item> items;
     ImageLoader imageLoader = AppController.getInstance().getImageLoader();
 
     public CustomCartListAdapter(Activity activity, List<Item> movieItems) {
         this.activity = activity;
-        this.movieItems = movieItems;
+        this.items = movieItems;
     }
 
     @Override
     public int getCount() {
-        return movieItems.size();
+        return items.size();
     }
 
     @Override
     public Object getItem(int location) {
-        return movieItems.get(location);
+        return items.get(location);
     }
 
     @Override
@@ -61,10 +56,9 @@ public class CustomCartListAdapter extends BaseAdapter {
         TextView pricetv = (TextView) convertView.findViewById(R.id.pricecartitem);
 
         TextView totaltv = (TextView) convertView.findViewById(R.id.carttotal);
-        // getting movie data for the row
-        Item m = movieItems.get(position);
 
-        // title
+        Item m = items.get(position);
+
         title.setText(m.getName());
 
         pricetv.setText(String.valueOf(m.getPrice()));
