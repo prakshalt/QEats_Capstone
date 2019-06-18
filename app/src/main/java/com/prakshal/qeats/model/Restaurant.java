@@ -1,6 +1,7 @@
 package com.prakshal.qeats.model;
 
 import java.util.Arrays;
+import java.util.List;
 
 public class Restaurant {
     private String restaurantId;
@@ -11,7 +12,7 @@ public class Restaurant {
     private double longitude;
     private String opensAt;
     private String closesAt;
-    private String[] attributes;
+    private List<String> attributes;
 
     public Restaurant() {
     }
@@ -80,12 +81,12 @@ public class Restaurant {
         this.closesAt = closesAt;
     }
 
-    public String[] getAttributes() {
-        return Arrays.copyOf(attributes,attributes.length);
+    public List<String> getAttributes() {
+        return attributes;
     }
 
-    public void setAttributes(String[] attributes) {
-        this.attributes = Arrays.copyOf(attributes,attributes.length);
+    public void setAttributes(List<String> attributes) {
+        this.attributes = attributes;
     }
 
     public String toString() {

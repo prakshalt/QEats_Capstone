@@ -16,6 +16,7 @@ import com.prakshal.qeats.adapter.CustomListAdapter;
 import com.prakshal.qeats.app.AppController;
 import com.prakshal.qeats.model.Restaurant;
 import com.prakshal.qeats.utils.Constants;
+import com.prakshal.qeats.utils.Parser;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -25,9 +26,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SearchActivity extends BaseDrawerActivity implements ActivityCompat.OnRequestPermissionsResultCallback{
-    private String ip="35.200.227.34";
+
     private String url = Constants.API_ENDPOINT + Constants.RESTAURANTS_API;
-    //private String url = "http://"+ip+":8081/qeats/v1/restaurants?latitude=";//21.724216&longitude=73.01525";
     private ProgressDialog pDialog;
     private List<Restaurant> restaurantList = new ArrayList<Restaurant>();
     private ListView listView;
@@ -86,33 +86,14 @@ public class SearchActivity extends BaseDrawerActivity implements ActivityCompat
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
-                            JSONArray obj1 = response.getJSONArray("restaurants");
+                            JSONArray restaurantsJsonArray = response.getJSONArray("restaurants");
                             Log.i("JSONResponse",response.toString());
                             hidePDialog();
 
-                            // Parsing json
-                            for (int i = 0; i < obj1.length(); i++) {
-
-
-                                JSONObject obj = obj1.getJSONObject(i);
-                                Restaurant restaurant = new Restaurant();
-                                restaurant.setRestaurantId(obj.getString("restaurantId"));
-                                restaurant.setName(obj.getString("name"));
-                                restaurant.setImageUrl(obj.getString("imageUrl"));
-                                restaurant.setOpensAt(obj.getString("opensAt"));
-                                restaurant.setClosesAt(obj.getString("closesAt"));
-
-                                JSONArray genreArry = obj.getJSONArray("attributes");
-                                ArrayList<String> genre = new ArrayList<String>();
-                                for (int j = 0; j < genreArry.length(); j++) {
-                                    genre.add((String) genreArry.get(j));
-                                }
-                                String[] attributes = new String[genre.size()];
-                                attributes = genre.toArray(attributes);
-                                restaurant.setAttributes(attributes);
-
+                            for (int i = 0; i < restaurantsJsonArray.length(); i++) {
+                                JSONObject obj = restaurantsJsonArray.getJSONObject(i);
+                                Restaurant restaurant = Parser.getRestaurantFromJson(obj);
                                 restaurantList.add(restaurant);
-
                             }
                         }catch (JSONException e) {
                             e.printStackTrace();

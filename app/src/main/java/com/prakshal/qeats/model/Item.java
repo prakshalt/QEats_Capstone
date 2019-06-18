@@ -10,6 +10,7 @@ public class Item {
     private String imageUrl;
     private List<String> attributes = new ArrayList<>();
     private int price;
+    private int itemCount;
 
     public String getId() {
         return id;
@@ -57,5 +58,13 @@ public class Item {
 
     public void setPrice(int price) {
         this.price = price;
+    }
+
+    public int getItemCount() {
+        return itemCount;
+    }
+
+    public void setItemCount(int itemCount) {
+        this.itemCount = itemCount;
     }
 }

@@ -2,6 +2,8 @@ package com.prakshal.qeats.app;
 
 import com.prakshal.qeats.utils.LruBitmapCache;
 import android.app.Application;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.text.TextUtils;
 
 import com.android.volley.Request;
@@ -60,5 +62,19 @@ public class AppController extends Application {
         if (mRequestQueue != null) {
             mRequestQueue.cancelAll(tag);
         }
+    }
+
+
+    public SharedPreferences getDefaultSharedPreferences(){
+        return PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+    }
+
+    public String getUserId() {
+        SharedPreferences sharedPreferences = getDefaultSharedPreferences();
+        String token = null;
+        if (sharedPreferences.contains("user_id")) {
+            token = sharedPreferences.getString("user_id", "");
+        }
+        return token;
     }
 }

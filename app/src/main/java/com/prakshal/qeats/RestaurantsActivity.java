@@ -28,6 +28,7 @@ import com.prakshal.qeats.adapter.CustomListAdapter;
 import com.prakshal.qeats.app.AppController;
 import com.prakshal.qeats.model.Restaurant;
 import com.prakshal.qeats.utils.Constants;
+import com.prakshal.qeats.utils.Parser;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -36,8 +37,8 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends BaseDrawerActivity implements ActivityCompat.OnRequestPermissionsResultCallback{ //implements LocationListener {
-    private static final String TAG = MainActivity.class.getSimpleName();
+public class RestaurantsActivity extends BaseDrawerActivity implements ActivityCompat.OnRequestPermissionsResultCallback{ //implements LocationListener {
+    private static final String TAG = RestaurantsActivity.class.getSimpleName();
     private static final int MY_PERMISSIONS_REQUEST_RECEIVE_SMS =0;
     String perms[]={Manifest.permission.ACCESS_COARSE_LOCATION,Manifest.permission.ACCESS_FINE_LOCATION};
 
@@ -92,7 +93,7 @@ public class MainActivity extends BaseDrawerActivity implements ActivityCompat.O
                         .setMessage("Do you want to grant the permissions required(App cannot work without them,please refer to help)")
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
-                                ActivityCompat.requestPermissions(MainActivity.this, perms,
+                                ActivityCompat.requestPermissions(RestaurantsActivity.this, perms,
                                         MY_PERMISSIONS_REQUEST_RECEIVE_SMS);
                             }
                         })
@@ -102,7 +103,7 @@ public class MainActivity extends BaseDrawerActivity implements ActivityCompat.O
                                 homeIntent.addCategory( Intent.CATEGORY_HOME );
                                 homeIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                                 startActivity(homeIntent);
-                                Toast.makeText(MainActivity.this,"You may have not granted one of the permissions",Toast.LENGTH_LONG).show();
+                                Toast.makeText(RestaurantsActivity.this,"You may have not granted one of the permissions",Toast.LENGTH_LONG).show();
                             }
                         })
                         .setIcon(android.R.drawable.ic_dialog_alert)
@@ -168,32 +169,14 @@ public class MainActivity extends BaseDrawerActivity implements ActivityCompat.O
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
-                            JSONArray obj1 = response.getJSONArray("restaurants");
+                            JSONArray restaurantsJsonArray = response.getJSONArray("restaurants");
+                            Log.i("JSONResponse",response.toString());
                             hidePDialog();
 
-                            // Parsing json
-                            for (int i = 0; i < obj1.length(); i++) {
-
-
-                                JSONObject obj = obj1.getJSONObject(i);
-                                Restaurant restaurant = new Restaurant();
-                                restaurant.setRestaurantId(obj.getString("restaurantId"));
-                                restaurant.setName(obj.getString("name"));
-                                restaurant.setImageUrl(obj.getString("imageUrl"));
-                                restaurant.setOpensAt(obj.getString("opensAt"));
-                                restaurant.setClosesAt(obj.getString("closesAt"));
-
-                                JSONArray genreArry = obj.getJSONArray("attributes");
-                                ArrayList<String> genre = new ArrayList<String>();
-                                for (int j = 0; j < genreArry.length(); j++) {
-                                    genre.add((String) genreArry.get(j));
-                                }
-                                String[] attributes = new String[genre.size()];
-                                attributes = genre.toArray(attributes);
-                                restaurant.setAttributes(attributes);
-
+                            for (int i = 0; i < restaurantsJsonArray.length(); i++) {
+                                JSONObject obj = restaurantsJsonArray.getJSONObject(i);
+                                Restaurant restaurant = Parser.getRestaurantFromJson(obj);
                                 restaurantList.add(restaurant);
-
                             }
                         }catch (JSONException e) {
                                 e.printStackTrace();

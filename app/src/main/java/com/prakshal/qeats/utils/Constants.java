@@ -2,7 +2,7 @@ package com.prakshal.qeats.utils;
 
 public class Constants {
 
-    public static String BASE_URL = "http://192.168.1.15:8081";
+    public static String BASE_URL = "http://54.224.99.51:8081";
 
     public static final String API_ENDPOINT = BASE_URL + "/qeats/v1";
 

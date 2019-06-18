@@ -10,6 +10,10 @@
             android:icon="@drawable/ic_search_white_24dp"
             android:title="Search" />
         <item
+            android:id="@+id/nav_my_orders"
+            android:icon="@drawable/ic_search_white_24dp"
+            android:title="My Orders" />
+        <item
             android:id="@+id/nav_cart"
             android:icon="@drawable/ic_shopping_cart_white_24dp"
             android:title="My cart"/>

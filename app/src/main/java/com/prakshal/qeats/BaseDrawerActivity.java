@@ -57,15 +57,16 @@ public class BaseDrawerActivity extends AppCompatActivity implements NavigationV
         }
         /*if(id==R.id.nav_main)
         {
-            startActivity(new Intent(getApplicationContext(),MainActivity.class));
+            startActivity(new Intent(getApplicationContext(),RestaurantsActivity.class));
         }*/
         if (id == R.id.nav_near) {
-            startActivity(new Intent(getApplicationContext(), MainActivity.class));
+            startActivity(new Intent(getApplicationContext(), RestaurantsActivity.class));
         } else if (id == R.id.nav_search) {
             startActivity(new Intent(getApplicationContext(), SearchActivity.class));
-        }
-        else if(id==R.id.nav_cart){
-            startActivity(new Intent(getApplicationContext(),CartActivity.class));
+        } else if(id==R.id.nav_cart){
+            startActivity(new Intent(getApplicationContext(), CartActivity.class));
+        }else if(id==R.id.nav_my_orders){
+            startActivity(new Intent(getApplicationContext(), OrdersActivity.class));
         }
         //Add more here to go to that activity on select
         drawerLayout.closeDrawer(GravityCompat.START);

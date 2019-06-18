@@ -1,26 +1,26 @@
-package com.prakshal.qeats;
+package com.prakshal.qeats.orders;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.Menu;
-import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.prakshal.qeats.R;
 import com.prakshal.qeats.adapter.CustomOrderListAdapter;
+import com.prakshal.qeats.adapter.OrderItemsListAdapter;
 import com.prakshal.qeats.app.AppController;
 import com.prakshal.qeats.login.LoginActivity;
+import com.prakshal.qeats.model.Item;
 import com.prakshal.qeats.model.Order;
-import com.prakshal.qeats.orders.OrderDeliveredActivity;
 import com.prakshal.qeats.utils.Constants;
 import com.prakshal.qeats.utils.Parser;
 
@@ -30,48 +30,53 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-public class OrdersActivity extends BaseDrawerActivity implements ActivityCompat.OnRequestPermissionsResultCallback {
+public class OrderDeliveredActivity extends AppCompatActivity {
 
-    private String url = Constants.API_ENDPOINT + Constants.GET_ORDERS_API;
+    private String url = Constants.API_ENDPOINT + Constants.GET_ORDER_API;
     private ProgressDialog pDialog;
-    private List<Order> orders = new ArrayList<>();
+    private Order order;
+    private List<Item> items = new ArrayList<>();
     private ListView listView;
-    private CustomOrderListAdapter adapter;
+    private OrderItemsListAdapter adapter;
+
+    private TextView placedAtTv;
+    private TextView restaurantTv;
+    private TextView deliveredAtTv;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getLayoutInflater().inflate(R.layout.activity_orders, frameLayout);
+        setContentView(R.layout.activity_order_delivered);
+        Bundle extras = getIntent().getExtras();
+        String orderId = null;
+        if(extras != null){
+            orderId = extras.getString("order_id");
+        } else {
+            finish();
+        }
 
-        listView = (ListView) findViewById(R.id.orders_list);
-        adapter = new CustomOrderListAdapter(this, orders);
-        sendRequest();
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position,
-                                    long id) {
-                Intent intent = new Intent(OrdersActivity.this, OrderDeliveredActivity.class);
-                intent.putExtra("order_id", orders.get(position).getId());
-                startActivity(intent);
-            }
-        });
+        placedAtTv = findViewById(R.id.placed_at);
+        restaurantTv = findViewById(R.id.restaurant_name);
+        deliveredAtTv = findViewById(R.id.delivered_at);
+
+        if(orderId != null){
+            listView = findViewById(R.id.order_items);
+            adapter = new OrderItemsListAdapter(this, items);
+            listView.setAdapter(adapter);
+            sendRequest(orderId);
+        }
 
     }
 
-    public void sendRequest(){
+    public void sendRequest(String orderId){
 
         pDialog = new ProgressDialog(this);
         // Showing progress dialog before making http request
         pDialog.setMessage("Loading...");
         pDialog.show();
 
-        String userId = AppController.getInstance().getUserId();
-        if(userId == null){
-            Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
-            startActivity(intent);
-        }
-
-        url += "?userId=" + userId;
+        url += "?orderId=" + orderId;
 
         JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, url,null, new
 
@@ -82,16 +87,15 @@ public class OrdersActivity extends BaseDrawerActivity implements ActivityCompat
                         try {
                             Log.i("JSONResponse",response.toString());
                             hidePDialog();
-                            List<Order> orderList = Parser.getOrdersFromJson(response);
-                            orders.addAll(orderList);
-                            listView.setAdapter(adapter);
+                            Order temp = Parser.getOrderFromJson(response);
+                            items.addAll(temp.getItems());
+                            order = temp;
+                            placedAtTv.setText(temp.getPlacedAt().toString());
+                            restaurantTv.setText(temp.getRestaurant().getName());
+                            deliveredAtTv.setText(temp.getStatus().name());
                         }catch (JSONException e) {
                             e.printStackTrace();
                         }
-
-
-                        // notifying list adapter about data changes
-                        // so that it renders the list view with updated data
                         adapter.notifyDataSetChanged();
                     }
                 }, new Response.ErrorListener() {
@@ -110,12 +114,6 @@ public class OrdersActivity extends BaseDrawerActivity implements ActivityCompat
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         // Adding request to request queue
         AppController.getInstance().addToRequestQueue(obreq);
-    }
-    @Override
-    protected void onResume() {
-        super.onResume();
-        // to check current activity in the navigation drawer
-        navigationView.getMenu().getItem(1).setChecked(true);
     }
 
     @Override
@@ -137,5 +135,4 @@ public class OrdersActivity extends BaseDrawerActivity implements ActivityCompat
         getMenuInflater().inflate(R.menu.mymenu, menu);
         return true;
     }
-
 }
