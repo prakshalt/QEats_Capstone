@@ -59,7 +59,7 @@ public class CustomOrderListAdapter extends BaseAdapter {
         orderIdtv.setText(orders.get(position).getId());
         restNametv.setText(orders.get(position).getRestaurant().getName());
         statustv.setText(orders.get(position).getStatus().name());
-        totaltv.setText(String.valueOf(orders.get(position).getTotal()));
+        totaltv.setText(String.format("\u20B9%s", String.valueOf(orders.get(position).getTotal())));
         StringBuilder items = new StringBuilder();
         for(Item item: orders.get(position).getItems()){
             items.append(item.getName());

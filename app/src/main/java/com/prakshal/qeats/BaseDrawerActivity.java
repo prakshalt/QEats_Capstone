@@ -16,7 +16,7 @@ public class BaseDrawerActivity extends AppCompatActivity implements NavigationV
 
     DrawerLayout drawerLayout;
     Toolbar toolbar;
-    FrameLayout frameLayout;
+    protected FrameLayout frameLayout;
     NavigationView navigationView;
 
     @Override

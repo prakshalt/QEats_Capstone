@@ -5,6 +5,9 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
@@ -30,7 +33,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-public class OrdersActivity extends BaseDrawerActivity implements ActivityCompat.OnRequestPermissionsResultCallback {
+public class OrdersActivity extends BaseDrawerActivity {
 
     private String url = Constants.API_ENDPOINT + Constants.GET_ORDERS_API;
     private ProgressDialog pDialog;
@@ -110,12 +113,6 @@ public class OrdersActivity extends BaseDrawerActivity implements ActivityCompat
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         // Adding request to request queue
         AppController.getInstance().addToRequestQueue(obreq);
-    }
-    @Override
-    protected void onResume() {
-        super.onResume();
-        // to check current activity in the navigation drawer
-        navigationView.getMenu().getItem(1).setChecked(true);
     }
 
     @Override

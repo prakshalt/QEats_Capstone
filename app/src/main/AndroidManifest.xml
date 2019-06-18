@@ -19,10 +19,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.NoActionBar"
         android:usesCleartextTraffic="true">
-        <activity android:name=".orders.OrderDeliveredActivity"></activity>
+        <activity android:name=".TrackOrderActivity"></activity>
+        <activity android:name=".orders.OrderDeliveredActivity" />
         <activity
             android:name=".login.LoginActivity"
-            android:label="@string/title_activity_login">
+            android:label="Qeats">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

@@ -1,24 +1,30 @@
 package com.prakshal.qeats.orders;
 
 import android.app.ProgressDialog;
-import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
+import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.AlertDialogLayout;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ListView;
+import android.widget.RatingBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
+import com.prakshal.qeats.BaseDrawerActivity;
 import com.prakshal.qeats.R;
-import com.prakshal.qeats.adapter.CustomOrderListAdapter;
 import com.prakshal.qeats.adapter.OrderItemsListAdapter;
 import com.prakshal.qeats.app.AppController;
-import com.prakshal.qeats.login.LoginActivity;
 import com.prakshal.qeats.model.Item;
 import com.prakshal.qeats.model.Order;
 import com.prakshal.qeats.utils.Constants;
@@ -27,10 +33,14 @@ import com.prakshal.qeats.utils.Parser;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
-public class OrderDeliveredActivity extends AppCompatActivity {
+public class OrderDeliveredActivity extends BaseDrawerActivity {
 
     private String url = Constants.API_ENDPOINT + Constants.GET_ORDER_API;
     private ProgressDialog pDialog;
@@ -42,16 +52,21 @@ public class OrderDeliveredActivity extends AppCompatActivity {
     private TextView placedAtTv;
     private TextView restaurantTv;
     private TextView deliveredAtTv;
+    private TextView totalTv;
+    private Button reorderBtn;
+    private Button rateBtn;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_order_delivered);
+        getLayoutInflater().inflate(R.layout.activity_order_delivered, frameLayout);
         Bundle extras = getIntent().getExtras();
         String orderId = null;
         if(extras != null){
             orderId = extras.getString("order_id");
+            getSupportActionBar().setTitle("Order #" + orderId);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         } else {
             finish();
         }
@@ -59,6 +74,7 @@ public class OrderDeliveredActivity extends AppCompatActivity {
         placedAtTv = findViewById(R.id.placed_at);
         restaurantTv = findViewById(R.id.restaurant_name);
         deliveredAtTv = findViewById(R.id.delivered_at);
+        totalTv = findViewById(R.id.total);
 
         if(orderId != null){
             listView = findViewById(R.id.order_items);
@@ -67,6 +83,94 @@ public class OrderDeliveredActivity extends AppCompatActivity {
             sendRequest(orderId);
         }
 
+        reorderBtn = findViewById(R.id.reorder_button);
+        rateBtn = findViewById(R.id.rate_button);
+
+
+        final String id = orderId;
+
+        reorderBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                reOrder(id);
+            }
+        });
+
+
+
+        rateBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(OrderDeliveredActivity.this, android.app.AlertDialog.THEME_DEVICE_DEFAULT_DARK);
+                LayoutInflater inflater = getLayoutInflater();
+                builder.setTitle("Rate your order:");
+                View dialogLayout = inflater.inflate(R.layout.alert_dialog_with_ratingbar, null);
+                final RatingBar ratingBar = dialogLayout.findViewById(R.id.ratingBar);
+                builder.setView(dialogLayout);
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        updateRating(ratingBar.getRating(), id);
+                        //Toast.makeText(getApplicationContext(), "Rating is " + ratingBar.getRating(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+                builder.show();
+            }
+        });
+
+    }
+
+    private void reOrder(final String orderId) {
+
+        String reOrderUrl = Constants.API_ENDPOINT + Constants.REORDER_API;
+
+        final String userId = AppController.getInstance().getUserId();
+
+        reOrderUrl += "?userId=" + userId;
+        reOrderUrl += "&orderId=" + orderId;
+
+        StringRequest request = new StringRequest(Request.Method.GET, reOrderUrl,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.i("response_rate", response);
+                        Toast.makeText(getApplicationContext(), "Items added to cart." , Toast.LENGTH_SHORT).show();
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError e) {
+                e.printStackTrace();
+            }
+        });
+
+        AppController.getInstance().addToRequestQueue(request);
+
+    }
+
+    public void updateRating(final float rating, final String orderId){
+
+        String ratingUrl = Constants.API_ENDPOINT + Constants.GET_RATE_API;
+
+        final String userId = AppController.getInstance().getUserId();
+
+        ratingUrl += "?userId=" + userId;
+        ratingUrl += "&orderId=" + orderId;
+        ratingUrl += "&rating=" + String.valueOf((int)rating);
+
+        StringRequest request = new StringRequest(Request.Method.GET, ratingUrl,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.i("response_rate", response);
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError e) {
+                e.printStackTrace();
+            }
+        });
+
+        AppController.getInstance().addToRequestQueue(request);
     }
 
     public void sendRequest(String orderId){
@@ -90,9 +194,14 @@ public class OrderDeliveredActivity extends AppCompatActivity {
                             Order temp = Parser.getOrderFromJson(response);
                             items.addAll(temp.getItems());
                             order = temp;
-                            placedAtTv.setText(temp.getPlacedAt().toString());
+                            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("d MMM HH:mm", Locale.getDefault());
+                            placedAtTv.setText(simpleDateFormat.format(temp.getPlacedAt()));
                             restaurantTv.setText(temp.getRestaurant().getName());
                             deliveredAtTv.setText(temp.getStatus().name());
+                            deliveredAtTv.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_baseline_done_24px, 0, 0, 0);
+                            totalTv.setText(String.format("₹ %s", String.valueOf(order.getTotal())));
+
+
                         }catch (JSONException e) {
                             e.printStackTrace();
                         }

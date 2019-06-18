@@ -2,16 +2,19 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:padding="10dp">
 
 
     <TextView
         android:id="@+id/item"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:textColor="#000"
+        android:textColor="#fff"
         android:textSize="12sp"
         android:textStyle="bold"
+        android:layout_gravity="start"
+        android:textAlignment="viewStart"
         android:layout_weight="1"/>
 
 
@@ -19,8 +22,10 @@
         android:id="@+id/price"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:textAlignment="viewEnd"
         android:layout_weight="1"
-        android:textColor="#000"
+        android:textColor="#fff"
         android:textSize="12sp" />
 
 </LinearLayout>

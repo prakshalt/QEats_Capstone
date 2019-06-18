@@ -53,11 +53,11 @@ public class OrderItemsListAdapter extends BaseAdapter {
         TextView itemTextView = convertView.findViewById(R.id.item);
         TextView priceTextView = convertView.findViewById(R.id.price);
 
-        String value = items.get(position).getName() + "x" + items.get(position).getItemCount();
+        String value = items.get(position).getName() + " x " + items.get(position).getItemCount();
         int price  = items.get(position).getPrice() * items.get(position).getItemCount();
 
         itemTextView.setText(value);
-        priceTextView.setText(String.valueOf(price));
+        priceTextView.setText(String.format("\u20B9 %s", String.valueOf(price)));
 
 
 
