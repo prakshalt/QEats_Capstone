@@ -20,5 +20,8 @@
     <string name="reoorder">REOORDER</string>
     <string name="reorder">REORDER</string>
     <string name="rate_your_order">RATE YOUR ORDER</string>
+    <string name="refresh_order_status">REFRESH ORDER STATUS</string>
+    <string name="cancel_order">CANCEL ORDER</string>
+    <string name="you_rated">YOU RATED</string>
 
 </resources>

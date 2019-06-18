@@ -26,6 +26,8 @@ public class Order {
 
     private Restaurant restaurant;
 
+    private boolean isRated;
+
     public String getId() {
         return id;
     }
@@ -104,5 +106,13 @@ public class Order {
 
     public void setRestaurant(Restaurant restaurant) {
         this.restaurant = restaurant;
+    }
+
+    public boolean isRated() {
+        return isRated;
+    }
+
+    public void setRated(boolean rated) {
+        isRated = rated;
     }
 }

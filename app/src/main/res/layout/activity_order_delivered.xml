@@ -37,6 +37,7 @@
         android:id="@+id/delivered_at"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:drawablePadding="5dp"
         android:layout_margin="10dp"
         android:textColor="#fff"/>
 
@@ -57,13 +58,15 @@
         android:id="@+id/order_items"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp" />
+        android:layout_margin="10dp"
+        android:divider="@null"
+        android:dividerHeight="0dp"/>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_margin="5dp">
+        android:layout_margin="10dp">
         <TextView
             android:id="@+id/text_total"
             android:layout_width="0dp"
@@ -82,6 +85,36 @@
             android:textAlignment="viewEnd"
             android:layout_weight="1"
             android:textColor="#fff"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/rating_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_margin="10dp">
+        <TextView
+            android:id="@+id/rated"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:textAlignment="viewStart"
+            android:layout_weight="1"
+            android:textColor="#fff"
+            android:text="@string/you_rated"/>
+
+        <RatingBar
+            android:id="@+id/rating_given"
+            style="@style/smallRatingBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:textAlignment="viewEnd"
+            android:numStars="5"
+            android:stepSize="1"
+            android:layout_margin="10dp"
+            android:theme="@style/RatingBar"/>
 
     </LinearLayout>
 

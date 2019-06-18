@@ -1,6 +1,7 @@
 package com.prakshal.qeats;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
@@ -11,6 +12,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.widget.FrameLayout;
+
+import com.prakshal.qeats.app.AppController;
+import com.prakshal.qeats.login.LoginActivity;
 
 public class BaseDrawerActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
 
@@ -67,6 +71,11 @@ public class BaseDrawerActivity extends AppCompatActivity implements NavigationV
             startActivity(new Intent(getApplicationContext(), CartActivity.class));
         }else if(id==R.id.nav_my_orders){
             startActivity(new Intent(getApplicationContext(), OrdersActivity.class));
+        }else if(id == R.id.logout){
+            SharedPreferences.Editor editor = AppController.getInstance().getDefaultSharedPreferences().edit();
+            editor.remove("user_id");
+            editor.apply();
+            startActivity(new Intent(getApplicationContext(), LoginActivity.class));
         }
         //Add more here to go to that activity on select
         drawerLayout.closeDrawer(GravityCompat.START);

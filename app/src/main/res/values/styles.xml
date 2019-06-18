@@ -14,4 +14,7 @@
         <item name="colorControlActivated">@color/yellow</item>
     </style>
 
+    <style name="smallRatingBar"
+        parent="android:style/Widget.Material.RatingBar.Small">
+    </style>
 </resources>

@@ -15,7 +15,7 @@
         android:textStyle="bold"
         android:layout_gravity="start"
         android:textAlignment="viewStart"
-        android:layout_weight="1"/>
+        android:layout_weight="2"/>
 
 
     <TextView

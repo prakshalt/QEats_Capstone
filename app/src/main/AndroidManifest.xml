@@ -19,11 +19,14 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.NoActionBar"
         android:usesCleartextTraffic="true">
-        <activity android:name=".TrackOrderActivity"></activity>
-        <activity android:name=".orders.OrderDeliveredActivity" />
+        <activity android:name=".orders.TrackOrderActivity"
+            android:noHistory="true"></activity>
+        <activity android:name=".orders.OrderDeliveredActivity"
+            android:noHistory="true"/>
         <activity
             android:name=".login.LoginActivity"
-            android:label="Qeats">
+            android:label="Qeats"
+            android:noHistory="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -32,9 +35,12 @@
         </activity>
         <activity android:name=".RestaurantsActivity" />
         <activity android:name=".ShowRestaurantMenuActivity" />
-        <activity android:name=".SearchActivity" />
-        <activity android:name=".CartActivity" />
-        <activity android:name=".OrdersActivity" />
+        <activity android:name=".SearchActivity"
+            android:noHistory="true"/>
+        <activity android:name=".CartActivity"
+            android:noHistory="true"/>
+        <activity android:name=".OrdersActivity"
+            android:noHistory="true"/>
     </application>
 
 </manifest>

@@ -59,6 +59,7 @@ public class Parser {
         order.setTotal(orderJsonObject.getInt("total"));
         order.setRestaurant(getRestaurantFromJson(orderJsonObject.getJSONObject("restaurant")));
         order.setStatus(Status.valueOf(orderJsonObject.getString("status")));
+        order.setRated(orderJsonObject.getBoolean("isRated"));
         return order;
     }
 

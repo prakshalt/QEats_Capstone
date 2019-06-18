@@ -18,6 +18,7 @@ import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.prakshal.qeats.adapter.CustomOrderListAdapter;
 import com.prakshal.qeats.app.AppController;
@@ -40,6 +41,7 @@ public class OrdersActivity extends BaseDrawerActivity {
     private List<Order> orders = new ArrayList<>();
     private ListView listView;
     private CustomOrderListAdapter adapter;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
