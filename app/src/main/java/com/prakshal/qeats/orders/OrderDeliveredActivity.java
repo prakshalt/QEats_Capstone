@@ -211,7 +211,7 @@ public class OrderDeliveredActivity extends BaseDrawerActivity {
                                 }else{
                                     deliveredAtTv.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_checked, 0, 0, 0);
                                 }
-                                if(order.isRated()){
+                                if(order.isRated() && order.getRating() > 0){
                                     ratingBar.setRating(order.getRating());
                                     ViewGroup layout = (ViewGroup) rateBtn.getParent();
                                     if(layout != null) //for safety only  as you are doing onClick

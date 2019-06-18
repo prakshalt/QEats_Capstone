@@ -56,7 +56,7 @@ public class CustomCartListAdapter extends BaseAdapter {
         TextView title = (TextView) convertView.findViewById(R.id.cartitemname);
         TextView pricetv = (TextView) convertView.findViewById(R.id.pricecartitem);
 
-        TextView totaltv = (TextView) convertView.findViewById(R.id.carttotal);
+        //TextView totaltv = (TextView) convertView.findViewById(R.id.carttotal);
 
         Item m = items.get(position);
 

@@ -23,5 +23,6 @@
     <string name="refresh_order_status">REFRESH ORDER STATUS</string>
     <string name="cancel_order">CANCEL ORDER</string>
     <string name="you_rated">YOU RATED</string>
+    <string name="place_order">PLACE ORDER</string>
 
 </resources>

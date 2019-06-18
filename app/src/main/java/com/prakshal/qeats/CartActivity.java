@@ -1,121 +1,202 @@
 package com.prakshal.qeats;
 
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
-import com.prakshal.qeats.adapter.CustomCartListAdapter;
+import com.prakshal.qeats.adapter.OrderItemsListAdapter;
 import com.prakshal.qeats.app.AppController;
+import com.prakshal.qeats.login.LoginActivity;
+import com.prakshal.qeats.model.Cart;
 import com.prakshal.qeats.model.Item;
+import com.prakshal.qeats.model.Order;
+import com.prakshal.qeats.orders.TrackOrderActivity;
 import com.prakshal.qeats.utils.Constants;
+import com.prakshal.qeats.utils.Parser;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class CartActivity extends BaseDrawerActivity implements ActivityCompat.OnRequestPermissionsResultCallback {
 
-    private String url = Constants.API_ENDPOINT + Constants.CART_API;
+
     private ProgressDialog pDialog;
-    private List<Item> itemList = new ArrayList<>();
-    private List<Integer> priceList = new ArrayList<>();
-   private ListView listView;
-   private String cartId;
-    String respStr;
-    private CustomCartListAdapter adapter;
-    private static boolean alreadyRecreated = false;
-    private static int total=0;
+    private Cart cart;
+    private List<Item> items = new ArrayList<>();
+    private ListView listView;
+    private OrderItemsListAdapter adapter;
 
-    public static int getTotal() {
-        return total;
-    }
+    private TextView totalTv;
+    private Button placeOrderBtn;
 
-    public static void setTotal(int total) {
-        CartActivity.total = total;
-    }
+    private String cartId = null;
 
-    public static void addTotal(int no) {
-        total += no;
-    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getLayoutInflater().inflate(R.layout.activity_cart, frameLayout);
-        listView = (ListView) findViewById(R.id.cartList);
-        adapter = new CustomCartListAdapter(this, itemList);
-        listView.setAdapter(adapter);
+
+        //restaurantTv = findViewById(R.id.restaurant_name);
+        totalTv = findViewById(R.id.total);
+
+
+        String userId = AppController.getInstance().getUserId();
+        if(userId == null){
+            startActivity(new Intent(this, LoginActivity.class));
+        } else{
+            listView = findViewById(R.id.order_items);
+            adapter = new OrderItemsListAdapter(this, items);
+            listView.setAdapter(adapter);
+            fetchCart(userId);
+        }
+
+
+        placeOrderBtn = findViewById(R.id.place_order_button);
+
+        placeOrderBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(cartId != null){
+                    new AlertDialog.Builder(CartActivity.this)
+                    .setTitle("Confirm")
+                    .setMessage("Do you want to place the order ?")
+                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int whichButton) {
+                            placeOrder(cartId);
+                        }
+                    })
+                    .setNegativeButton(android.R.string.no, null)
+                    .show();
+                } else {
+                    recreate();
+                }
+            }
+        });
+
+    }
+
+    public void placeOrder(final String cartId){
+
+        Log.i("CART_ID", cartId);
+
+        String url = Constants.API_ENDPOINT + Constants.POST_ORDER_API;
+
         pDialog = new ProgressDialog(this);
-        // Showing progress dialog before making http request(i.e Loading anim)
-        pDialog.setMessage("Loading...");
+        // Showing progress dialog before making http request
+        pDialog.setMessage("Placing your order...");
         pDialog.show();
-        //This is used to send request for getting a JSON object.
-        JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, url,null, new
+
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("cartId", cartId);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, url, jsonObject, new
 
                 Response.Listener<JSONObject>() {
 
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
-                            JSONArray obj1 = response.getJSONArray("items"); //This gives array of objects
                             Log.i("JSONResponse",response.toString());
-                            cartId = response.getString("id"); //use getters on response to get value of specific key
-                            hidePDialog();//stop loading anim
-
-                            // Parsing json
-                            for (int i = 0; i < obj1.length(); i++) {
-
-
-                                JSONObject obj = obj1.getJSONObject(i);
-                                Item item = new Item();
-                                item.setItemId(obj.getString("itemId"));
-                                item.setName(obj.getString("name"));
-                                item.setImageUrl(obj.getString("imageUrl"));
-                                item.setPrice(obj.getInt("price"));
-                                addTotal(item.getPrice());
-                                JSONArray genreArry = obj.getJSONArray("attributes");
-                                ArrayList<String> genre = new ArrayList<String>();
-                                for (int j = 0; j < genreArry.length(); j++) {
-                                    genre.add((String) genreArry.get(j));
-                                }
-                                item.setAttributes(genre);
-                                itemList.add(item);
-                                priceList.add(obj.getInt("price"));
-                            }
+                            Order temp = Parser.getOrderFromJson(response);
+                            Intent intent = new Intent(CartActivity.this, TrackOrderActivity.class);
+                            intent.putExtra("order_id", temp.getId());
+                            startActivity(intent);
+                            hidePDialog();
                         }catch (JSONException e) {
                             e.printStackTrace();
+                            Toast.makeText(getApplicationContext(), "Error placing order." , Toast.LENGTH_SHORT).show();
+                        }
+                        adapter.notifyDataSetChanged();
+                        hidePDialog();
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+                Toast.makeText(getApplicationContext(), "Error placing order." , Toast.LENGTH_SHORT).show();
+                error.printStackTrace();
+                hidePDialog();
+
+            }
+        });
+        request.setRetryPolicy(new DefaultRetryPolicy(
+                10000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        // Adding request to request queue
+        AppController.getInstance().addToRequestQueue(request);
+    }
+
+    public void fetchCart(final String userId){
+
+
+        String url = Constants.API_ENDPOINT + Constants.CART_API;
+
+        pDialog = new ProgressDialog(this);
+        // Showing progress dialog before making http request
+        pDialog.setMessage("Placing your order...");
+        pDialog.show();
+
+        url += "?userId=" + userId;
+
+        JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, url, null, new
+
+                Response.Listener<JSONObject>() {
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            Log.i("CART_API_RESPONSE", response.toString());
+                            Cart temp = Parser.getCartFromJson(response);
+                            if(temp.getItems().size() == 0){
+                                Toast.makeText(getApplicationContext(), "Empty cart, add some items." , Toast.LENGTH_SHORT).show();
+                            }
+                            cart = temp;
+                            cartId = temp.getId();
+                            items.addAll(temp.getItems());
+                            //restaurantTv.setText(temp.getRestaurant().getName());
+                            totalTv.setText(String.format("₹ %s", String.valueOf(cart.getTotal())));
+                            hidePDialog();
+                        }catch (JSONException e) {
+                            e.printStackTrace();
+                            Toast.makeText(getApplicationContext(), "Error fetching data." , Toast.LENGTH_SHORT).show();
                         }
                         adapter.notifyDataSetChanged();
                     }
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.i("inside","errorresponse");
-              //  VolleyLog.d(TAG, "Error: " + error.getClass());
                 error.printStackTrace();
+                Toast.makeText(getApplicationContext(), "Error fetching data." , Toast.LENGTH_SHORT).show();
                 hidePDialog();
 
             }
@@ -126,85 +207,6 @@ public class CartActivity extends BaseDrawerActivity implements ActivityCompat.O
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         // Adding request to request queue
         AppController.getInstance().addToRequestQueue(obreq);
-        Log.i("PriceList",Arrays.toString(priceList.toArray()));
-        TextView carttotal = (TextView) findViewById(R.id.carttotal);
-        carttotal.setText("Total="+String.valueOf(getTotal()));
-
-        //Order Button
-        Button orderBtn = (Button) findViewById(R.id.orderbtn);
-        orderBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String response = sendOrder(cartId);
-            }
-        });
-
-    }
-
-    public String sendOrder(String cartId){
-        String url = Constants.API_ENDPOINT + Constants.GET_ORDER_API;
-        final String requestBody="{\"cartId\":\"" + cartId + "\"}";
-
-        StringRequest strRequest = new StringRequest(Request.Method.POST, url,
-                new Response.Listener<String>()
-                {
-                    @Override
-                    public void onResponse(String response)
-                    {
-                        Log.i("response",response);
-                        respStr = response;
-                    }
-                },
-                new Response.ErrorListener()
-                {
-                    @Override
-                    public void onErrorResponse(VolleyError error)
-                    {
-
-                    }
-                })
-        {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
-                headers.put("Content-Type", "application/json; charset=utf-8");
-                return headers;
-            }
-            @Override
-            public byte[] getBody() throws AuthFailureError {
-                try {
-                    return requestBody == null ? null : requestBody.getBytes("utf-8");
-                } catch (UnsupportedEncodingException uee) {
-                    VolleyLog.wtf("Unsupported Encoding while trying to get the bytes of %s using %s", requestBody, "utf-8");
-                    return null;
-                }
-            }
-        };
-        AppController.getInstance().addToRequestQueue(strRequest);
-        return respStr;
-    }
-    @Override
-    protected void onResume() {
-        super.onResume();
-        // to check current activity in the navigation drawer
-        navigationView.getMenu().getItem(2).setChecked(true);
-        final Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                // Do something after 5s = 5000ms
-                if(!alreadyRecreated){
-                    Intent intent = getIntent();
-                    finish();
-                    intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-                    startActivity(intent);
-                  //  recreate();
-                    alreadyRecreated = true;
-                }
-            }
-        }, 500);
-
-
     }
 
 
@@ -212,7 +214,6 @@ public class CartActivity extends BaseDrawerActivity implements ActivityCompat.O
     public void onDestroy() {
         super.onDestroy();
         hidePDialog();
-        setTotal(0);
     }
 
     private void hidePDialog() {
@@ -227,5 +228,18 @@ public class CartActivity extends BaseDrawerActivity implements ActivityCompat.O
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.mymenu, menu);
         return true;
+    }
+
+    @Override
+    public void onBackPressed() {
+        finish();
+    }
+
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        finish();
+        startActivity(getIntent());
     }
 }

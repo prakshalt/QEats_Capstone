@@ -99,7 +99,7 @@ public class TrackOrderActivity extends BaseDrawerActivity {
         });
     }
 
-    private void cancelOrder(String id) {
+    private void cancelOrder(final String id) {
 
         String cancelOrderUrl = Constants.API_ENDPOINT + Constants.ORDER_CANCEL_API;
 
@@ -112,9 +112,10 @@ public class TrackOrderActivity extends BaseDrawerActivity {
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        Log.i("response_rate", response);
+                        Log.i("cancel_order", response);
                         Toast.makeText(getApplicationContext(), "Order cancelled." , Toast.LENGTH_LONG).show();
                         Intent intent = new Intent(TrackOrderActivity.this, OrderDeliveredActivity.class);
+                        intent.putExtra("order_id", id);
                         startActivity(intent);
                     }
                 }, new Response.ErrorListener() {

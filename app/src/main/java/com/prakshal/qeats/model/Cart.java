@@ -7,7 +7,8 @@ public class Cart {
 
     private String id;
 
-    private String restaurantId = "";
+    private String restaurantId;
+
     private String userId;
 
     private List<Item> items = new ArrayList<>();

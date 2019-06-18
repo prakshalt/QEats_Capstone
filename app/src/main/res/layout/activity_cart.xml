@@ -1,27 +1,98 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".CartActivity" >
+    tools:context=".orders.OrderDeliveredActivity"
+    android:orientation="vertical">
 
-    <ListView
-        android:id="@+id/cartList"
-        android:layout_width="fill_parent"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:divider="@color/list_divider"
-        android:dividerHeight="1dp"
-        android:listSelector="@drawable/list_row_selector" />
+        android:orientation="horizontal"
+        android:layout_margin="5dp">
+        <TextView
+            android:id="@+id/restaurant_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:textAlignment="viewStart"
+            android:layout_weight="1"
+            android:textColor="#fff"/>
+
+        <TextView
+            android:id="@+id/placed_at"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:textAlignment="viewEnd"
+            android:layout_weight="1"
+            android:textColor="#fff"/>
+
+    </LinearLayout>
+
     <TextView
-        android:layout_width="fill_parent"
-        android:layout_below="@id/cartList"
+        android:id="@+id/delivered_at"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="#FFF"
-        android:id="@+id/carttotal"/>
-    <Button
+        android:drawablePadding="5dp"
+        android:layout_margin="10dp"
+        android:textColor="#fff"/>
+
+    <TextView
+        android:id="@+id/textView3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/orderbtn"
-        android:text="Order"
-        android:layout_below="@id/carttotal"/>
+        android:text="@string/bill_details"
+        android:layout_marginBottom="30dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginStart="10dp"
+        android:textColor="#fff"
+        android:textStyle="bold"
+        />
 
-</RelativeLayout>
+    <ListView
+        android:id="@+id/order_items"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:divider="@null"
+        android:dividerHeight="0dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_margin="10dp">
+        <TextView
+            android:id="@+id/text_total"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:textAlignment="viewStart"
+            android:layout_weight="1"
+            android:textColor="#fff"
+            android:text="@string/total"/>
+
+        <TextView
+            android:id="@+id/total"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:textAlignment="viewEnd"
+            android:layout_weight="1"
+            android:textColor="#fff"/>
+
+    </LinearLayout>
+
+
+    <Button
+        android:id="@+id/place_order_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/place_order" />
+
+</LinearLayout>

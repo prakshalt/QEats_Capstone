@@ -2,6 +2,7 @@ package com.prakshal.qeats.utils;
 
 import android.util.Log;
 
+import com.prakshal.qeats.model.Cart;
 import com.prakshal.qeats.model.Item;
 import com.prakshal.qeats.model.Order;
 import com.prakshal.qeats.model.Restaurant;
@@ -78,8 +79,11 @@ public class Parser {
         restaurant.setImageUrl(restaurantJsonObject.getString("imageUrl"));
         restaurant.setOpensAt(restaurantJsonObject.getString("opensAt"));
         restaurant.setClosesAt(restaurantJsonObject.getString("closesAt"));
-        restaurant.setAttributes(getAtttributesFromJson(
-                restaurantJsonObject.getJSONArray("attributes")));
+
+        if(restaurantJsonObject.getJSONArray("attributes") != null){
+            restaurant.setAttributes(getAtttributesFromJson(
+                    restaurantJsonObject.getJSONArray("attributes")));
+        }
         return restaurant;
     }
 
@@ -89,5 +93,35 @@ public class Parser {
         item.setName(itemJsonObject.getString("name"));
         item.setPrice(itemJsonObject.getInt("price"));
         return item;
+    }
+
+    public static Cart getCartFromJson(JSONObject cartJsonObject) throws JSONException {
+        Cart cart = new Cart();
+        Map<String, Integer> map = new LinkedHashMap<>();
+        cart.setId(cartJsonObject.getString("id"));
+        cart.setRestaurantId(cartJsonObject.getString("restaurantId"));
+        cart.setUserId(cartJsonObject.getString("userId"));
+        JSONArray items = cartJsonObject.getJSONArray("items");
+        for (int j = 0; j < items.length(); j++) {
+            Item item = getItemFromJson(items.getJSONObject(j));
+            Integer itemCount = map.get(item.getId());
+            if(itemCount != null){
+                map.put(item.getId(), itemCount + 1);
+            } else{
+                map.put(item.getId(), 1);
+
+                cart.getItems().add(item);
+            }
+        }
+
+        for(Item item : cart.getItems()) {
+            Integer itemCount = map.get(item.getId());
+            if (itemCount != null)
+                item.setItemCount(itemCount);
+        }
+        cart.setTotal(cartJsonObject.getInt("total"));
+        //cart.setRestaurant(getRestaurantFromJson(orderJsonObject.getJSONObject("restaurant")));
+        return cart;
+
     }
 }
