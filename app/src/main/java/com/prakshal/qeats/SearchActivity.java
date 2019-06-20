@@ -5,6 +5,9 @@ import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.Menu;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 
 import com.android.volley.DefaultRetryPolicy;
@@ -27,7 +30,8 @@ import java.util.List;
 
 public class SearchActivity extends BaseDrawerActivity implements ActivityCompat.OnRequestPermissionsResultCallback{
 
-    private String url = Constants.API_ENDPOINT + Constants.RESTAURANTS_API;
+    private String baseUrl = Constants.API_ENDPOINT + Constants.RESTAURANTS_API;
+    private String url;
     private ProgressDialog pDialog;
     private List<Restaurant> restaurantList = new ArrayList<Restaurant>();
     private ListView listView;
@@ -65,11 +69,22 @@ public class SearchActivity extends BaseDrawerActivity implements ActivityCompat
                     }
                 });
         Log.i("Location",Float.toString(getLatitude()));
-        url += String.valueOf(getLatitude()) + "&longitude=" + String.valueOf(getLongitude())+"&searchFor=Hot";
+        final EditText searchText = (EditText) findViewById(R.id.search_rest);
+        Button searchBtn = (Button) findViewById(R.id.search_rest_btn);
         listView = (ListView) findViewById(R.id.searchlist);
         adapter = new CustomListAdapter(this, restaurantList);
         listView.setAdapter(adapter);
-        sendRequest();
+        searchBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String searchString = searchText.getText().toString();
+                url = baseUrl + "?latitude=" + String.valueOf(getLatitude()) + "&longitude=" + String.valueOf(getLongitude())+"&searchFor="+searchString;
+                sendRequest();
+            }
+        });
+
+
+
 
     }
 

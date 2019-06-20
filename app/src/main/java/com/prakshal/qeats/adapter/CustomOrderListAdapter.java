@@ -2,6 +2,7 @@ package com.prakshal.qeats.adapter;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -64,6 +65,19 @@ public class CustomOrderListAdapter extends BaseAdapter {
         restNametv.setText(orders.get(position).getRestaurant().getName());
         statustv.setText(orders.get(position).getStatus().name());
         totaltv.setText(String.format("\u20B9 %s", String.valueOf(orders.get(position).getTotal())));
+
+        if(statustv.getText().toString().equals("PLACED")){
+            statustv.setTextColor(Color.parseColor("#0000FF"));
+        }
+        if(statustv.getText().toString().equals("CANCELLED")){
+            statustv.setTextColor(Color.parseColor("#FF0000"));
+        }
+        if(statustv.getText().toString().equals("DELIVERED")){
+            statustv.setTextColor(Color.parseColor("#00FF00"));
+        }
+        else {
+            statustv.setTextColor(Color.parseColor("#FFA500"));
+        }
 
 
         StringBuilder items = new StringBuilder();
