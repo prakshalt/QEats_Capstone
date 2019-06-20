@@ -1,6 +1,7 @@
 <resources>
 
     <string name="app_name">QEats</string>
+    <string name="BASE_URL">35.200.227.34</string>
     <string name="title_activity_login">Sign in</string>
     <!-- Strings related to login -->
     <string name="prompt_email">Email</string>

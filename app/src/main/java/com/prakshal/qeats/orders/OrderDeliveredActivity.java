@@ -272,9 +272,7 @@ public class OrderDeliveredActivity extends BaseDrawerActivity {
     }
 
     @Override
-    public void onBackPressed() {
-        finish();
-    }
+    public void onBackPressed() { finish(); }
 
 
     @Override

@@ -8,6 +8,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
@@ -180,7 +181,7 @@ public class CartActivity extends BaseDrawerActivity implements ActivityCompat.O
 
         pDialog = new ProgressDialog(this);
         // Showing progress dialog before making http request
-        pDialog.setMessage("Placing your order...");
+        pDialog.setMessage("Loading your cart...");
         pDialog.show();
 
         url += "?userId=" + userId;
@@ -253,6 +254,12 @@ public class CartActivity extends BaseDrawerActivity implements ActivityCompat.O
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.mymenu, menu);
         return true;
+    }
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.cart_icon) {
+            startActivity(new Intent(this, CartActivity.class));
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override

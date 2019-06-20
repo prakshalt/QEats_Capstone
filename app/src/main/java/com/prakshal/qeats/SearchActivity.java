@@ -1,10 +1,16 @@
 package com.prakshal.qeats;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 
 import com.android.volley.DefaultRetryPolicy;
@@ -27,7 +33,8 @@ import java.util.List;
 
 public class SearchActivity extends BaseDrawerActivity implements ActivityCompat.OnRequestPermissionsResultCallback{
 
-    private String url = Constants.API_ENDPOINT + Constants.RESTAURANTS_API;
+    private String baseUrl = Constants.API_ENDPOINT + Constants.RESTAURANTS_API;
+    private String url;
     private ProgressDialog pDialog;
     private List<Restaurant> restaurantList = new ArrayList<Restaurant>();
     private ListView listView;
@@ -65,11 +72,43 @@ public class SearchActivity extends BaseDrawerActivity implements ActivityCompat
                     }
                 });
         Log.i("Location",Float.toString(getLatitude()));
-        url += String.valueOf(getLatitude()) + "&longitude=" + String.valueOf(getLongitude())+"&searchFor=Hot";
+        final EditText searchText = (EditText) findViewById(R.id.search_rest);
+        Button searchBtn = (Button) findViewById(R.id.search_rest_btn);
         listView = (ListView) findViewById(R.id.searchlist);
         adapter = new CustomListAdapter(this, restaurantList);
         listView.setAdapter(adapter);
-        sendRequest();
+        searchBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String searchString = searchText.getText().toString();
+                url = baseUrl + "?latitude=" + String.valueOf(getLatitude()) + "&longitude=" + String.valueOf(getLongitude())+"&searchFor="+searchString;
+                sendRequest();
+            }
+        });
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view,
+                                    int position, long id) {
+
+                // ListView Clicked item index
+                int itemPosition     = position;
+
+                // ListView Clicked item value
+                Restaurant  restaurant    = (Restaurant) listView.getItemAtPosition(position);
+
+                String restId = restaurant.getRestaurantId();
+
+                Intent intent = new Intent(getBaseContext(), ShowRestaurantMenuActivity.class);
+                intent.putExtra("RESTAURANT_ID", restId);
+                intent.putExtra("RESTAURANT_NAME",restaurant.getName());
+                startActivity(intent);
+            }
+
+        });
+
+
+
 
     }
 
@@ -146,6 +185,12 @@ public class SearchActivity extends BaseDrawerActivity implements ActivityCompat
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.mymenu, menu);
         return true;
+    }
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.cart_icon) {
+            startActivity(new Intent(this, CartActivity.class));
+        }
+        return super.onOptionsItemSelected(item);
     }
 
 
