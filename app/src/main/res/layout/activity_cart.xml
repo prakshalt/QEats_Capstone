@@ -95,4 +95,10 @@
         android:layout_height="wrap_content"
         android:text="@string/place_order" />
 
+    <Button
+        android:id="@+id/edit_cart_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/edit_order" />
+
 </LinearLayout>

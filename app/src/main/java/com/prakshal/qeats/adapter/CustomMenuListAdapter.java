@@ -3,12 +3,15 @@ package com.prakshal.qeats.adapter;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,8 +27,10 @@ import com.prakshal.qeats.R;
 import com.prakshal.qeats.app.AppController;
 import com.prakshal.qeats.model.Cart;
 import com.prakshal.qeats.model.Item;
+import com.prakshal.qeats.orders.OrderDeliveredActivity;
 import com.prakshal.qeats.utils.Constants;
 import com.prakshal.qeats.utils.Parser;
+import com.prakshal.qeats.utils.VolleyCallback;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -70,6 +75,11 @@ public class CustomMenuListAdapter extends BaseAdapter {
 
     @Override
     public View getView(final int position, View convertView, final ViewGroup parent) {
+
+        final String userId = AppController.getInstance().getUserId();
+
+        fetchCart(userId);
+
         view = convertView;
         if (inflater == null)
             inflater = (LayoutInflater) activity
@@ -91,13 +101,30 @@ public class CustomMenuListAdapter extends BaseAdapter {
 
         Button removeFromCartBtn = convertView.findViewById(R.id.remove_from_cart_btn);
 
-        final String userId = AppController.getInstance().getUserId();
+
 
         removeFromCartBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(cart != null){
-                    removeFromCart(cart.getId(), items.get(position).getId(), restId, parent);
+                    removeFromCart(cart.getId(), items.get(position).getId(), restId, new VolleyCallback (){
+                        @Override
+                        public void onSuccess(String responseStr) {
+                            try {
+                                JSONObject response = new JSONObject(responseStr);
+                                int cartResponseType = response.getInt("cartResponseType");
+                                Cart temp = Parser.getCartFromJson(response.getJSONObject("cart"));
+                                Toast.makeText(parent.getContext(),"Item removed from cart.",Toast.LENGTH_LONG).show();
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                        @Override
+                        public void onError(String response) {
+                            Toast.makeText(parent.getContext(),"Item not removed from cart.",Toast.LENGTH_LONG).show();
+                        }
+                    });
                 } else{
                     fetchCart(userId);
                     Toast.makeText(parent.getContext(),"Item not removed to cart",Toast.LENGTH_LONG).show();
@@ -109,7 +136,39 @@ public class CustomMenuListAdapter extends BaseAdapter {
             @Override
             public void onClick(View v) {
                 if(cart != null){
-                    addToCart(cart.getId(), items.get(position).getId(), restId, parent);
+                    addToCart(cart.getId(), items.get(position).getId(), restId, new VolleyCallback (){
+                        @Override
+                        public void onSuccess(String responseStr) {
+                            try {
+                                JSONObject response = new JSONObject(responseStr);
+                                int cartResponseType = response.getInt("cartResponseType");
+                                final Cart temp = Parser.getCartFromJson(response.getJSONObject("cart"));
+                                if(cartResponseType == 0){
+                                    Toast.makeText(parent.getContext(),"Item added to cart.",Toast.LENGTH_LONG).show();
+                                } else {
+                                    AlertDialog.Builder builder = new AlertDialog.Builder(parent.getContext(), android.app.AlertDialog.THEME_DEVICE_DEFAULT_DARK);
+                                    LayoutInflater inflater = CustomMenuListAdapter.this.inflater;
+                                    builder.setTitle("Clear cart ?")
+                                            .setMessage("You have items from other restaurant in your cart. Do you want to clear the cart ?");
+                                    builder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialogInterface, int i) {
+                                            clearCart(temp.getId(), parent);
+                                        }
+                                    });
+                                    builder.setCancelable(true);
+                                    builder.show();
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                        @Override
+                        public void onError(String response) {
+                            Toast.makeText(parent.getContext(),"Item not removed from cart.",Toast.LENGTH_LONG).show();
+                        }
+                    });
                 } else{
                     fetchCart(userId);
                     Toast.makeText(parent.getContext(),"Item not added to cart",Toast.LENGTH_LONG).show();
@@ -120,8 +179,32 @@ public class CustomMenuListAdapter extends BaseAdapter {
         return convertView;
     }
 
+    private void clearCart(String id, final ViewGroup parent) {
 
-    public void addToCart(final String cartId, final String itemId, final String restId, final ViewGroup parent){
+        String url = Constants.API_ENDPOINT + Constants.CART_CLEAR_API;
+
+        url += "?cartId=" + id;
+
+        JsonObjectRequest strRequest = new JsonObjectRequest(Request.Method.GET, url, null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Log.i("response",response.toString());
+                        Toast.makeText(parent.getContext(),"You can now add items from this restaurant.",Toast.LENGTH_LONG).show();
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(parent.getContext(),"Error clearing your cart, try again.",Toast.LENGTH_LONG).show();
+                    }
+                });
+
+        AppController.getInstance().addToRequestQueue(strRequest);
+    }
+
+
+    public void addToCart(final String cartId, final String itemId, final String restId, final VolleyCallback callback){
 
         String url = Constants.API_ENDPOINT + Constants.CART_ITEM_API;
 
@@ -139,22 +222,23 @@ public class CustomMenuListAdapter extends BaseAdapter {
                 @Override
                 public void onResponse(JSONObject response) {
                     Log.i("response",response.toString());
-                    Toast.makeText(parent.getContext(),"Item added to cart.",Toast.LENGTH_LONG).show();
+                    callback.onSuccess(response.toString());
+
                 }
             },
             new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    Toast.makeText(parent.getContext(),"Item not added to cart.",Toast.LENGTH_LONG).show();
+                    callback.onError(error.toString());
                 }
             });
 
         AppController.getInstance().addToRequestQueue(strRequest);
     }
 
-    public void removeFromCart(final String cartId, final String itemId, final String restId, final ViewGroup parent){
+    public void removeFromCart(final String cartId, final String itemId, final String restId, final VolleyCallback callback){
 
-        String url = Constants.API_ENDPOINT + Constants.CART_ITEM_API;
+        String url = Constants.API_ENDPOINT + Constants.CART_ITEM_DELETE_API;
 
 
         JSONObject jsonObject = new JSONObject();
@@ -166,18 +250,18 @@ public class CustomMenuListAdapter extends BaseAdapter {
             e.printStackTrace();
         }
 
-        JsonObjectRequest strRequest = new JsonObjectRequest(Request.Method.DELETE, url, jsonObject,
+        JsonObjectRequest strRequest = new JsonObjectRequest(Request.Method.POST, url, jsonObject,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
                         Log.i("response",response.toString());
-                        Toast.makeText(parent.getContext(),"Item removed from cart.",Toast.LENGTH_LONG).show();
+                        callback.onSuccess(response.toString());
                     }
                 },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(parent.getContext(),"Item not removed to cart.",Toast.LENGTH_LONG).show();
+                        callback.onError(error.toString());
                     }
                 });
 

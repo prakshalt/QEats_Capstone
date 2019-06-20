@@ -122,6 +122,7 @@ public class TrackOrderActivity extends BaseDrawerActivity {
             @Override
             public void onErrorResponse(VolleyError e) {
                 e.printStackTrace();
+                Toast.makeText(getApplicationContext(), "Unable to cancel your order." , Toast.LENGTH_LONG).show();
             }
         });
 

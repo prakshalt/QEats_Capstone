@@ -41,30 +41,32 @@
         android:gravity="end">
 
         <Button
-            android:id="@+id/add_to_cart_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            style="?android:attr/buttonBarButtonStyle"
-            android:text="@string/add"
-            android:textAlignment="center"
-            android:textSize="18sp"/>
-
-        <TextView
-            android:id="@+id/item_count"
-            android:layout_width="50dp"
-            android:layout_height="wrap_content"
-            android:textSize="18sp"
-            android:text="@string/zero"
-            android:textAlignment="center"/>
-
-        <Button
             android:id="@+id/remove_from_cart_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAlignment="center"
             style="?android:attr/buttonBarButtonStyle"
             android:text="@string/remove"
-            android:textSize="18sp"/>
+            android:textSize="28sp"/>
+
+
+        <!-- <TextView
+             android:id="@+id/item_count"
+             android:layout_width="50dp"
+             android:layout_height="wrap_content"
+             android:textSize="18sp"
+             android:text="@string/zero"
+             android:textAlignment="center"/>-->
+
+        <Button
+            android:id="@+id/add_to_cart_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="?android:attr/buttonBarButtonStyle"
+            android:text="@string/add"
+            android:textAlignment="center"
+            android:textSize="28sp"/>
+
     </LinearLayout>
 
 

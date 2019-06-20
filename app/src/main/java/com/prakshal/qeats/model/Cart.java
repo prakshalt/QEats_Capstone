@@ -15,6 +15,8 @@ public class Cart {
 
     private int total;
 
+    private Restaurant restaurant;
+
     public String getId() {
         return id;
     }
@@ -53,5 +55,14 @@ public class Cart {
 
     public void setTotal(int total) {
         this.total = total;
+    }
+
+
+    public Restaurant getRestaurant() {
+        return restaurant;
+    }
+
+    public void setRestaurant(Restaurant restaurant) {
+        this.restaurant = restaurant;
     }
 }

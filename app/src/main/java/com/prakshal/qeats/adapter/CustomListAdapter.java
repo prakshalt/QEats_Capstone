@@ -59,9 +59,9 @@ public class CustomListAdapter extends BaseAdapter {
         NetworkImageView thumbNail = (NetworkImageView) convertView
                 .findViewById(R.id.thumbnail);
         TextView title = (TextView) convertView.findViewById(R.id.title);
-        TextView timings = (TextView) convertView.findViewById(R.id.rating);
+        TextView timings = (TextView) convertView.findViewById(R.id.timings);
         TextView genre = (TextView) convertView.findViewById(R.id.genre);
-        TextView ratings = (TextView) convertView.findViewById(R.id.releaseYear);
+        //TextView ratings = (TextView) convertView.findViewById(R.id.releaseYear);
 
         Restaurant m = restaurants.get(position);
 
@@ -72,7 +72,7 @@ public class CustomListAdapter extends BaseAdapter {
         title.setText(m.getName());
 
         // rating
-        timings.setText("Timings: " + String.valueOf(m.getOpensAt()+"-"+m.getClosesAt()));
+        timings.setText("Timings: " + String.valueOf(m.getOpensAt()+" - "+m.getClosesAt()));
 
         // genre
         String genreStr = "";
@@ -84,7 +84,7 @@ public class CustomListAdapter extends BaseAdapter {
         genre.setText(genreStr);
 
         // release year
-        ratings.setText("Ratings:"+String.valueOf(5));
+        //ratings.setText("Ratings:"+String.valueOf(5));
 
         return convertView;
     }

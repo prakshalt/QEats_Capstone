@@ -54,8 +54,6 @@ public class RestaurantsActivity extends BaseDrawerActivity implements ActivityC
     public static float  latitude,longitude;
 
 
-
-
     public static void setLatitude(float lat){
         latitude = lat;
     }

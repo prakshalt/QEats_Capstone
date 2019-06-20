@@ -25,7 +25,7 @@
 
 
     <TextView
-        android:id="@+id/rating"
+        android:id="@+id/timings"
         android:textColor="#000"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
@@ -38,7 +38,7 @@
         android:id="@+id/genre"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/rating"
+        android:layout_below="@id/timings"
         android:layout_marginTop="5dp"
         android:layout_toRightOf="@id/thumbnail"
         android:textColor="@color/genre"

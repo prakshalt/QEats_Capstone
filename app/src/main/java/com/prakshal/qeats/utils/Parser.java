@@ -56,12 +56,16 @@ public class Parser {
             if (itemCount != null)
                 item.setItemCount(itemCount);
         }
-        order.setPlacedAt(new Date(orderJsonObject.getInt("placedAt")));
+        order.setPlacedAt(new Date(orderJsonObject.getLong("placedAt")));
         order.setRating(orderJsonObject.getInt("rating"));
         order.setTotal(orderJsonObject.getInt("total"));
         order.setRestaurant(getRestaurantFromJson(orderJsonObject.getJSONObject("restaurant")));
         order.setStatus(Status.valueOf(orderJsonObject.getString("status")));
-        order.setRated(orderJsonObject.getBoolean("isRated"));
+        try{
+            order.setRated(orderJsonObject.getBoolean("isRated"));
+        }catch (JSONException e){
+            order.setRated(false);
+        }
         return order;
     }
 
@@ -119,7 +123,8 @@ public class Parser {
                 item.setItemCount(itemCount);
         }
         cart.setTotal(cartJsonObject.getInt("total"));
-        //cart.setRestaurant(getRestaurantFromJson(orderJsonObject.getJSONObject("restaurant")));
+        if(cartJsonObject.has("restaurant"))
+        cart.setRestaurant(getRestaurantFromJson(cartJsonObject.getJSONObject("restaurant")));
         return cart;
 
     }

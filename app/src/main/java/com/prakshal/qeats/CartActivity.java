@@ -14,13 +14,11 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.StringRequest;
 import com.prakshal.qeats.adapter.OrderItemsListAdapter;
 import com.prakshal.qeats.app.AppController;
 import com.prakshal.qeats.login.LoginActivity;
@@ -35,9 +33,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class CartActivity extends BaseDrawerActivity implements ActivityCompat.OnRequestPermissionsResultCallback {
 
@@ -48,8 +44,11 @@ public class CartActivity extends BaseDrawerActivity implements ActivityCompat.O
     private ListView listView;
     private OrderItemsListAdapter adapter;
 
+    private TextView restaurantTv;
     private TextView totalTv;
     private Button placeOrderBtn;
+    private Button editCartBtn;
+
 
     private String cartId = null;
 
@@ -60,7 +59,7 @@ public class CartActivity extends BaseDrawerActivity implements ActivityCompat.O
         super.onCreate(savedInstanceState);
         getLayoutInflater().inflate(R.layout.activity_cart, frameLayout);
 
-        //restaurantTv = findViewById(R.id.restaurant_name);
+        restaurantTv = findViewById(R.id.restaurant_name);
         totalTv = findViewById(R.id.total);
 
 
@@ -76,11 +75,12 @@ public class CartActivity extends BaseDrawerActivity implements ActivityCompat.O
 
 
         placeOrderBtn = findViewById(R.id.place_order_button);
+        editCartBtn = findViewById(R.id.edit_cart_button);
 
         placeOrderBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(cartId != null){
+                if(cartId != null && cart.getItems().size() > 0){
                     new AlertDialog.Builder(CartActivity.this)
                     .setTitle("Confirm")
                     .setMessage("Do you want to place the order ?")
@@ -91,8 +91,25 @@ public class CartActivity extends BaseDrawerActivity implements ActivityCompat.O
                     })
                     .setNegativeButton(android.R.string.no, null)
                     .show();
+                } else if(cart.getItems().size() == 0){
+                    Toast.makeText(getApplicationContext(), "Empty cart, add some items." , Toast.LENGTH_SHORT).show();
                 } else {
                     recreate();
+                }
+            }
+        });
+
+
+        editCartBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(cart != null && cart.getItems().size() > 0){
+                    Intent intent = new Intent(getBaseContext(), ShowRestaurantMenuActivity.class);
+                    intent.putExtra("RESTAURANT_ID", cart.getRestaurantId());
+                    intent.putExtra("RESTAURANT_NAME", cart.getRestaurant().getName());
+                    startActivity(intent);
+                } else {
+                    Toast.makeText(getApplicationContext(), "Empty cart, add some items." , Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -183,7 +200,15 @@ public class CartActivity extends BaseDrawerActivity implements ActivityCompat.O
                             cart = temp;
                             cartId = temp.getId();
                             items.addAll(temp.getItems());
-                            //restaurantTv.setText(temp.getRestaurant().getName());
+                            if(cart.getRestaurant() != null && cart.getItems().size() > 0)
+                                if(cart.getRestaurant().getName().equals("null")){
+                                    restaurantTv.setText("");
+                                }else{
+                                    restaurantTv.setText(temp.getRestaurant().getName());
+                                }
+                            else{
+                                restaurantTv.setText("");
+                            }
                             totalTv.setText(String.format("₹ %s", String.valueOf(cart.getTotal())));
                             hidePDialog();
                         }catch (JSONException e) {

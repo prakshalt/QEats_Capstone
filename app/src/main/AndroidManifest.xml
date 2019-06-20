@@ -33,7 +33,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".RestaurantsActivity" />
-        <activity android:name=".ShowRestaurantMenuActivity" />
+        <activity android:name=".ShowRestaurantMenuActivity"
+            android:noHistory="true"/>
         <activity android:name=".SearchActivity"
             android:noHistory="true"/>
         <activity android:name=".CartActivity"

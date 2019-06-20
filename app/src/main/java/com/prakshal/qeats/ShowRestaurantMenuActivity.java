@@ -67,8 +67,47 @@ public class ShowRestaurantMenuActivity extends BaseDrawerActivity implements Ac
         pDialog.setMessage("Loading...");
         pDialog.show();
         fetchRestaurantMenu(restId);
-        //fetchCart(userId);
+       // fetchCart(userId);
         hidePDialog();
+    }
+
+    private void fetchCart(String userId) {
+
+        String url = Constants.API_ENDPOINT + Constants.CART_API;
+
+        url += "?userId=" + userId;
+
+        JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, url, null, new
+
+                Response.Listener<JSONObject>() {
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            Log.i("CART_API_RESPONSE", response.toString());
+                            Cart temp = Parser.getCartFromJson(response);
+                            //if(temp.getItems().size() == 0){
+                            // Toast.makeText(getApplicationContext(), "Empty cart, add some items." , Toast.LENGTH_SHORT).show();
+                            // }
+                            cart = temp;
+                        }catch (JSONException e) {
+                            e.printStackTrace();
+                            // Toast.makeText(getApplicationContext(), "Error fetching data." , Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                error.printStackTrace();
+                //Toast.makeText(getApplicationContext(), "Error fetching data." , Toast.LENGTH_SHORT).show();
+            }
+        });
+        obreq.setRetryPolicy(new DefaultRetryPolicy(
+                10000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        // Adding request to request queue
+        AppController.getInstance().addToRequestQueue(obreq);
     }
 
     public void fetchRestaurantMenu(final String restId){
