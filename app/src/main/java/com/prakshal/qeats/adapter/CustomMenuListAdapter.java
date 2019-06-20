@@ -93,6 +93,8 @@ public class CustomMenuListAdapter extends BaseAdapter {
 
         final String userId = AppController.getInstance().getUserId();
 
+        fetchCart(userId);
+
         removeFromCartBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
