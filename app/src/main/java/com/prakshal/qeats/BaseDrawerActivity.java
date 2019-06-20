@@ -64,12 +64,16 @@ public class BaseDrawerActivity extends AppCompatActivity implements NavigationV
             startActivity(new Intent(getApplicationContext(),RestaurantsActivity.class));
         }*/
         if (id == R.id.nav_near) {
+            finish();
             startActivity(new Intent(getApplicationContext(), RestaurantsActivity.class));
         } else if (id == R.id.nav_search) {
+            finish();
             startActivity(new Intent(getApplicationContext(), SearchActivity.class));
         } else if(id==R.id.nav_cart){
+            finish();
             startActivity(new Intent(getApplicationContext(), CartActivity.class));
         }else if(id==R.id.nav_my_orders){
+            finish();
             startActivity(new Intent(getApplicationContext(), OrdersActivity.class));
         }else if(id == R.id.logout){
             SharedPreferences.Editor editor = AppController.getInstance().getDefaultSharedPreferences().edit();
@@ -90,5 +94,4 @@ public class BaseDrawerActivity extends AppCompatActivity implements NavigationV
         }
         return super.onOptionsItemSelected(item);
     }
-
 }

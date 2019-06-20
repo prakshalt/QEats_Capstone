@@ -155,6 +155,7 @@ public class RestaurantsActivity extends BaseDrawerActivity implements ActivityC
                 String restId = restaurant.getRestaurantId();
 
                 Intent intent = new Intent(getBaseContext(), ShowRestaurantMenuActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT);
                 intent.putExtra("RESTAURANT_ID", restId);
                 intent.putExtra("RESTAURANT_NAME",restaurant.getName());
                 startActivity(intent);
